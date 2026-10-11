@@ -211,7 +211,10 @@ function layoutGeometry(){const boxes=[];let w,h;if(selectedLayout==='portrait')
     $('#beginBooth').addEventListener('click',()=>{const button=$('#beginBooth');if(button.disabled)return;button.disabled=true;$('#welcomeScreen').setAttribute('aria-hidden','true');beginCameraSetup()});
     $('#retryCamera').addEventListener('click',()=>{beginCameraSetup()});
     $('#backHome').addEventListener('click',async()=>{cameraAttempt++;stopCamera();clearLoadingMessage();loadingScreen.classList.add('is-leaving');await wait(400);loadingScreen.classList.add('hidden');loadingScreen.classList.remove('is-visible','is-leaving');loadingScreen.setAttribute('aria-hidden','true');const welcome=$('#welcomeScreen'),button=$('#beginBooth');welcome.classList.remove('hidden','is-leaving');welcome.setAttribute('aria-hidden','false');button.disabled=false;button.focus({preventScroll:true})});
-    const fontsReady=document.fonts?document.fonts.ready:Promise.resolve();fontsReady.then(()=>document.documentElement.classList.add('ready'));
+    const fontsReady=document.fonts?document.fonts.ready:Promise.resolve();
+    const pageVisible=document.visibilityState==='visible'?Promise.resolve():new Promise(resolve=>{const onVisibilityChange=()=>{if(document.visibilityState==='visible'){document.removeEventListener('visibilitychange',onVisibilityChange);resolve()}};document.addEventListener('visibilitychange',onVisibilityChange)});
+    // Start only after fonts load and the page is visible, so the reveal isn't spent in a background tab.
+    Promise.all([fontsReady,pageVisible]).then(()=>requestAnimationFrame(()=>document.documentElement.classList.add('ready')));
 })();
 </script>
 </body>
