@@ -4,7 +4,7 @@
 
 # 📸 Snappy Baby
 
-A modern Korean-style web photobooth built with HTML, CSS, and JavaScript.
+A modern Korean-style web photobooth built with Vite, TypeScript, HTML, and CSS.
 
 ## ✨ Features
 
@@ -16,35 +16,39 @@ A modern Korean-style web photobooth built with HTML, CSS, and JavaScript.
 
 ## 🛠️ Built With
 
+- Vite
+- TypeScript
 - HTML5
 - CSS3
-- JavaScript
-- Node.js
 
 ## 🚀 Getting Started
 
-1. Clone the repository
+1. Clone the repository and install dependencies
 
 ```bash
 git clone https://github.com/ranzxgit/Snappy-baby.git
-```
-
-2. Install dependencies
-
-```bash
+cd Snappy-baby
 npm install
 ```
 
-3. Start the server
+2. Start the development server
 
 ```bash
-node server.mjs
+npm run dev
 ```
 
-4. Open your browser
+Open the URL printed by Vite (usually `http://localhost:5173`).
 
+3. Build the static site
+
+```bash
+npm run build
 ```
-http://localhost:4173
+
+To preview the production build locally:
+
+```bash
+npm run preview
 ```
 
 ## 📄 License
