@@ -279,7 +279,7 @@ body.is-printing .app-shell{filter:blur(8px);opacity:.42;transform:scale(.985);t
 .welcome-camera-lens{top:55px;width:66px;height:66px;border-width:7px}
 .welcome-camera-lens span{width:10px;height:10px}
 .welcome-camera-slot{right:24px;bottom:16px;left:24px;height:7px}
-.welcome-photo{bottom:0;width:156px;height:210px;grid-template-columns:1fr;gap:0;padding:9px 9px 8px;transform:translateX(-50%) rotate(1.5deg);border-radius:3px;box-shadow:0 15px 34px #38332a20;animation:welcomePrintBob 4s 1s ease-in-out infinite}
+.welcome-photo{bottom:14px;width:156px;height:210px;grid-template-columns:1fr;gap:0;padding:9px 9px 8px;transform:translateX(-50%) rotate(1.5deg);border-radius:3px;box-shadow:0 15px 34px #38332a20;animation:welcomePrintBob 4s 1s ease-in-out infinite}
 .welcome-sample-grid{display:grid;min-height:0;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4px}
 .welcome-sample-grid span{position:relative;overflow:hidden;border-radius:2px;background:linear-gradient(145deg,#e5d8c9,#c0ad99 54%,#899087)}
 .welcome-sample-grid span:nth-child(2){background:linear-gradient(145deg,#eee3d7,#c6b5a4 54%,#92958b)}
@@ -524,3 +524,16 @@ body.is-printing .app-shell{filter:blur(8px);opacity:.42;transform:scale(.985);t
 @media(prefers-reduced-motion:reduce){.print-paper{clip-path:inset(0 0 100% 0)!important;transform:none!important;transition:clip-path .25s ease!important;animation:none!important}.print-theater.processing .printer-body,.print-theater.feeding .printer-body,.print-processing i{animation:none!important}.print-theater.processing .printer-lens::after,.print-theater.feeding .printer-lens::after{animation:none!important}}
 /* The JavaScript feed animation drives the paper's clip and subpixel sway. */
 .print-theater.feeding .print-paper{animation:none}
+
+/* Stagger the welcome copy so it gently pops into view on each page load. */
+#welcomeScreen .welcome-header{animation:welcomePopIn .7s cubic-bezier(.22,1,.36,1) .12s both}
+#welcomeScreen .welcome-kicker{animation:welcomePopIn .7s cubic-bezier(.22,1,.36,1) .25s both}
+#welcomeScreen #welcomeTitle{animation:welcomePopIn .7s cubic-bezier(.22,1,.36,1) .38s both}
+#welcomeScreen .welcome-slogan{animation:welcomePopIn .7s cubic-bezier(.22,1,.36,1) .51s both}
+#welcomeScreen .welcome-cta{animation:welcomePopIn .7s cubic-bezier(.22,1,.36,1) .64s both}
+#welcomeScreen .welcome-cta:hover,#welcomeScreen .welcome-cta:focus-visible{animation:none}
+#welcomeScreen .welcome-promise{animation:welcomePopIn .7s cubic-bezier(.22,1,.36,1) .77s both}
+@keyframes welcomePopIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){
+  #welcomeScreen .welcome-header,#welcomeScreen .welcome-kicker,#welcomeScreen #welcomeTitle,#welcomeScreen .welcome-slogan,#welcomeScreen .welcome-cta,#welcomeScreen .welcome-promise{animation:none!important;opacity:1!important;transform:none!important}
+}
