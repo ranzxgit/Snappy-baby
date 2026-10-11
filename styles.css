@@ -571,3 +571,14 @@ body.is-printing .app-shell{filter:blur(8px);opacity:.42;transform:scale(.985);t
   .loading-action{transition:none!important;transform:none!important}
   .booth-arriving{animation:none!important}
 }
+
+/* Reveal home text in reading order after mount and font loading. */
+.ios-reveal{display:inline-block;opacity:0;transform:translateY(10px) scale(.97);filter:blur(8px)}
+.ready #welcomeScreen .ios-reveal{animation:iosTextReveal .9s cubic-bezier(.32,.72,0,1) calc(var(--i) * 70ms) both}
+@keyframes iosTextReveal{from{opacity:0;transform:translateY(10px) scale(.97);filter:blur(8px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes iosTextRevealReduced{from{opacity:0}to{opacity:1}}
+#welcomeScreen,#welcomeScreen .welcome-header,#welcomeScreen .welcome-copy,#welcomeScreen .welcome-visual,#welcomeScreen .welcome-kicker,#welcomeScreen h1,#welcomeScreen .welcome-slogan,#welcomeScreen .welcome-cta,#welcomeScreen .welcome-promise{animation:none!important}
+@media(prefers-reduced-motion:reduce){
+  #welcomeScreen .ios-reveal{transform:none;filter:none}
+  .ready #welcomeScreen .ios-reveal{animation:iosTextRevealReduced .3s ease-out calc(var(--i) * 70ms) both!important;animation-duration:.3s!important}
+}
