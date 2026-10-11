@@ -446,15 +446,15 @@ body.is-printing .app-shell{filter:blur(8px);opacity:.42;transform:scale(.985);t
 
 
 /* A gentle pointer invites visitors to try the home camera lens. */
-.welcome-lens-cue{position:absolute;z-index:3;top:111px;left:calc(50% + 41%);display:flex;align-items:center;min-height:25px;color:#9b806c;font-size:10px;font-weight:600;letter-spacing:.03em;white-space:nowrap;pointer-events:none;animation:lensCuePulse 2.8s ease-in-out infinite}
-.welcome-lens-cue svg{position:absolute;top:-2px;right:calc(100% - 3px);width:25px;height:34px;overflow:visible}
-.welcome-lens-cue-line,.welcome-lens-cue-arrow{stroke:#b89d7e;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.7}
+.welcome-lens-cue{position:absolute;z-index:3;top:111px;left:calc(50% + 46%);display:flex;align-items:center;min-height:25px;color:#9b806c;font-size:10px;font-weight:600;letter-spacing:.03em;white-space:nowrap;pointer-events:none;animation:lensCuePulse 2.8s ease-in-out infinite}
+.welcome-lens-cue svg{position:absolute;top:0;right:calc(100% + 7px);width:40px;height:24px;overflow:visible}
+.welcome-lens-cue-line,.welcome-lens-cue-arrow{stroke:#9b806c;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5}
 .welcome-lens-cue-line{stroke-dasharray:64;stroke-dashoffset:64;animation:lensCueDraw 2.8s ease-in-out infinite}
 .welcome-lens-cue-arrow{opacity:0;animation:lensCueArrow 2.8s ease-in-out infinite}
 @keyframes lensCuePulse{0%,100%{opacity:.35}45%,72%{opacity:1}}
 @keyframes lensCueDraw{0%,12%{stroke-dashoffset:64;opacity:.25}48%,78%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:.25}}
 @keyframes lensCueArrow{0%,42%{opacity:0}55%,78%{opacity:1}100%{opacity:.25}}
-@media(max-width:760px){.welcome-lens-cue{top:78px;left:calc(50% + 41%);font-size:9px}.welcome-lens-cue svg{width:22px}}
+@media(max-width:760px){.welcome-lens-cue{display:none}}
 @media(prefers-reduced-motion:reduce){.welcome-lens-cue,.welcome-lens-cue-line,.welcome-lens-cue-arrow{animation:none!important}.welcome-lens-cue{opacity:.85}.welcome-lens-cue-line{stroke-dashoffset:0}.welcome-lens-cue-arrow{opacity:1}}
 /* Luxury studio polish: tactile shutter, live keepsake previews, and cinematic capture. */
 .app-shell.camera-fit{background-color:var(--paper,#f7f5f0);background-image:radial-gradient(ellipse at 16% 8%,#fff9 0,transparent 36%),linear-gradient(#b9aa9410 1px,transparent 1px),linear-gradient(90deg,#b9aa9410 1px,transparent 1px);background-size:auto,34px 34px,34px 34px}
