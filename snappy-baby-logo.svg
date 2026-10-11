@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Snappy Baby camera mascot</title>
+  <g stroke="#cbbfc3" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#fffdfa" d="M138 145a42 42 0 1 1 84 0v21h-84zm152 0a42 42 0 1 1 84 0v21h-84z"/>
+    <path fill="#f6dfe2" d="M156 145a24 24 0 1 1 48 0v21h-48zm152 0a24 24 0 1 1 48 0v21h-48z"/>
+    <path fill="#fffdfa" d="M109 183c6-21 26-34 50-36 62-7 132-7 194 0 30 4 50 23 54 53l10 155c3 39-17 60-55 64-72 8-147 8-219 0-35-4-53-25-55-61l8-143c1-12 4-23 13-32z"/>
+    <path d="M94 251h330"/>
+    <path fill="#f8f3f0" d="M197 151l16-34c4-9 13-15 24-15h70c11 0 20 6 24 16l15 34"/>
+    <circle cx="192" cy="190" r="10" fill="#cbbfc3"/>
+    <path d="M254 202c12 11 26 11 38 0m24-8c10-12 21-13 31-4m-29 10c8 0 13 3 16 8"/>
+    <path fill="#f5d9dd" stroke="none" d="M157 208c-10-7-21 4-14 14l11 12 15-10c10-7 1-21-10-16l-2 1zm177 0c-10-7-21 4-14 14l11 12 15-10c10-7 1-21-10-16l-2 1z"/>
+    <path d="M143 216l-5 8m14-10-5 11m14-10-5 9m171-8-5 8m14-10-5 11m14-10-5 9"/>
+    <rect fill="#fffdfa" x="352" y="189" width="47" height="31" rx="8"/>
+    <circle fill="#fbf8f4" cx="259" cy="294" r="72" stroke-width="9"/>
+    <circle fill="#fffdfa" cx="259" cy="294" r="56" stroke-width="6"/>
+    <circle fill="#f3eeeb" cx="259" cy="294" r="43" stroke-width="5"/>
+    <circle cx="242" cy="280" r="7" fill="#fffdfa" stroke="none"/><circle cx="233" cy="297" r="3" fill="#fffdfa" stroke="none"/><circle cx="277" cy="310" r="4" fill="#fffdfa" stroke="none"/>
+    <path d="M110 325c-17-8-28-21-31-37-2-11 10-17 18-9l11 10 16-20c8-10 22 0 14 11l-15 21c-3 15 2 28 15 37l11 7m257-28c16-12 21-26 19-40-1-11-15-13-19-2l-6 13-18-17c-9-8-20 4-11 13l17 17c-1 15-10 25-25 31l-13 5"/>
+    <path fill="#fffdfa" d="M164 402h193l-21 83c-2 9-10 15-20 15H192c-10 0-18-7-19-17z"/>
+    <path d="M187 417h147l-13 53H175z"/>
+    <path d="M260 418l-7 51"/>
+    <path fill="#f4e8e6" stroke-width="4" d="M194 427h42v34h-42zm57 0h42v34h-42z"/>
+    <path fill="#f4e8e6" stroke-width="4" d="M183 466h47v25h-47zm57 0h47v25h-47z"/>
+    <circle cx="210" cy="438" r="5" fill="#fffdfa" stroke-width="3"/><path d="M200 454c3-8 17-8 20 0m-13-17v1m8-1v1" stroke-width="2.5"/>
+    <circle cx="272" cy="438" r="5" fill="#fffdfa" stroke-width="3"/><path d="M262 454c3-8 17-8 20 0m-13-17v1m8-1v1" stroke-width="2.5"/>
+    <circle cx="201" cy="475" r="4" fill="#fffdfa" stroke-width="2.5"/><path d="M193 488c2-6 14-6 16 0m-10-14v1m6-1v1" stroke-width="2"/>
+    <circle cx="258" cy="475" r="4" fill="#fffdfa" stroke-width="2.5"/><path d="M250 488c2-6 14-6 16 0m-10-14v1m6-1v1" stroke-width="2"/>
+  </g>
+  <path d="M239 499c6-8 13-8 18 0m-7 7c5-5 10-5 14 0" stroke="#e7b8c0" stroke-width="4" stroke-linecap="round"/>
+  <path d="M72 231c-8-12 8-21 17-11 9-10 25-1 17 11l-17 16z" fill="#f8e6e8" stroke="#cbbfc3" stroke-width="6" stroke-linejoin="round"/>
+</svg>
