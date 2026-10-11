@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="snappybaby.gif" alt="Snappy Baby demo" width="700">
+</p>
+
 # 📸 Snappy Baby
 
 A modern Korean-style web photobooth built with HTML, CSS, and JavaScript.
@@ -42,10 +46,6 @@ node server.mjs
 ```
 http://localhost:4173
 ```
-
-## 📸 Preview
-
-(Add a screenshot here later)
 
 ## 📄 License
 
