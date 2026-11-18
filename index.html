@@ -14,7 +14,7 @@
     <span class="welcome-full-flash" id="welcomeFullFlash" aria-hidden="true"></span>
     <header class="welcome-header">
       <a class="welcome-brand" href="#welcomeTitle" aria-label="Snappy Baby home"><span class="welcome-brand-name"><span class="ios-reveal" style="--i:0">Snappy Baby</span></span></a>
-      <nav class="welcome-nav" aria-label="Main navigation"><a href="#welcomeTitle"><span class="ios-reveal" style="--i:1">About</span></a><a href="#welcomeGallery"><span class="ios-reveal" style="--i:2">Gallery</span></a><a href="#beginBooth"><span class="ios-reveal" style="--i:3">Contact</span></a></nav>
+      <nav class="welcome-nav" aria-label="Main navigation"><a href="#welcomeTitle"><span class="ios-reveal" style="--i:1">About</span></a><a href="#welcomeGallery"><span class="ios-reveal" style="--i:2">Gallery</span></a><a href="#beginBooth"><span class="ios-reveal" style="--i:3">Contact</span></a><a href="#faqModal" id="welcomeFaqLink" aria-haspopup="dialog"><span class="ios-reveal" style="--i:4">FAQ</span></a></nav>
     </header>
     <section class="welcome-content">
       <div class="welcome-copy">
@@ -34,7 +34,6 @@
         <p class="welcome-visual-caption"><span class="ios-reveal" style="--i:12">Four frames, one favorite moment.</span></p>
       </div>
     </section>
-
   </main>
   <section class="loading-screen hidden" id="loadingScreen" aria-hidden="true" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">
     <div class="loading-content" id="loadingContent">
@@ -52,7 +51,12 @@
   <div class="app-shell hidden" id="boothApp" aria-hidden="true">
     <header class="topbar">
       <a class="brand" href="#" aria-label="Snappy Baby home"><span class="brand-name">snappy<span> baby</span></span></a>
-      <span class="session-label">YOUR LITTLE PHOTO STUDIO</span><div class="top-right"><button class="icon-btn" id="themeMode" aria-label="Toggle dark mode" title="Toggle dark mode"><svg id="modeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/></svg></button><button class="icon-btn" id="settingsFocus" aria-label="Focus session settings" title="Session settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1a1.7 1.7 0 0 1-2.4 2.4l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a1.7 1.7 0 0 1-3.4 0v-.2a1.7 1.7 0 0 0-2.9-1.2l-.1.1a1.7 1.7 0 0 1-2.4-2.4l.1-.1A1.7 1.7 0 0 0 4.2 12H4a1.7 1.7 0 0 1 0-3.4h.2a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a1.7 1.7 0 0 1 2.4-2.4l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a1.7 1.7 0 0 1 3.4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a1.7 1.7 0 0 1 2.4 2.4l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a1.7 1.7 0 0 1 0 3.4h-.2a1.7 1.7 0 0 0-1.2 2.9Z"/></svg></button></div>
+      <span class="session-label">YOUR LITTLE PHOTO STUDIO</span>
+      <div class="top-right">
+        <button class="icon-btn faq-button" id="faqButton" type="button" aria-label="Frequently asked questions" title="Frequently asked questions">FAQ</button>
+        <button class="icon-btn" id="themeMode" aria-label="Toggle dark mode" title="Toggle dark mode"><svg id="modeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/></svg></button>
+        <button class="icon-btn" id="settingsFocus" aria-label="Focus session settings" title="Session settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1a1.7 1.7 0 0 1-2.4 2.4l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a1.7 1.7 0 0 1-3.4 0v-.2a1.7 1.7 0 0 0-2.9-1.2l-.1.1a1.7 1.7 0 0 1-2.4-2.4l.1-.1A1.7 1.7 0 0 0 4.2 12H4a1.7 1.7 0 0 1 0-3.4h.2a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a1.7 1.7 0 0 1 2.4-2.4l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a1.7 1.7 0 0 1 3.4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a1.7 1.7 0 0 1 2.4 2.4l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a1.7 1.7 0 0 1 0 3.4h-.2a1.7 1.7 0 0 0-1.2 2.9Z"/></svg></button>
+      </div>
     </header>
     <main class="main" id="cameraScreen">
       <section class="left-column">
@@ -96,6 +100,18 @@
   </div>
   <div class="modal-wrap" id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewTitle"><div class="preview-card"><div class="preview-header"><div><h2 id="previewTitle">Your little keepsake</h2><p>Take a peek. Make it yours.</p></div><button class="icon-btn" id="closePreview" aria-label="Close preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="preview-content"><div class="strip-stage"><canvas id="stripCanvas" class="strip-canvas" aria-label="Photo strip preview"></canvas></div><div class="preview-options"><div><div class="option-label">CURRENT TEMPLATE</div><div class="preview-theme-name" id="previewTheme">Classic</div><div class="frame-picker" id="previewThemeChoices"></div></div><div><div class="option-label">A NOTE ON YOUR STRIP</div><input class="custom-input" id="previewCaption" maxlength="30" placeholder="Write a little something…" aria-label="Preview strip text"/></div><div class="date-line"><label class="toggle"><input type="checkbox" id="previewDate" checked/> Date</label><label class="toggle"><input type="checkbox" id="previewTime"/> Time</label><span style="flex:1"></span><span class="option-label" id="datePreview"></span></div><div class="preview-actions"><button class="primary-btn" id="saveStrip">↓ &nbsp; Download photo strip</button><button class="secondary-btn" id="shareStrip">↗ &nbsp; Share your strip</button><button class="secondary-btn" id="retake">↺ &nbsp; Retake photos</button><button class="secondary-btn" id="newStrip">＋ &nbsp; Create a new strip</button></div><p class="tiny-note">A little memory, ready to go wherever you do.</p></div></div></div></div>
   <div class="print-theater" id="printTheater" aria-hidden="true"><div class="print-theater-inner"><div class="print-title"><span class="print-kicker">A LITTLE MOMENT, MADE YOURS</span><h2>Making your keepsake</h2><p>Your photos are on their way.</p><span class="print-processing"><i></i>Preparing your photos</span></div><div class="printer-scene"><div class="printer-body"><div class="printer-top"><span class="printer-brand">SNAPPY BABY</span><span class="printer-light"></span></div><div class="printer-face"><span class="printer-lens"></span><span class="printer-status">PHOTO STUDIO · 01</span></div><div class="printer-slot"><span></span></div></div><div class="print-feed-window"><div class="print-paper"><img id="printPhoto" alt="Your finished photobooth collage" /></div></div></div><div class="print-actions" id="printActions"><p>Save a copy or share this little memory.</p><div class="print-action-row"><button class="primary-btn" id="printSave">Save Photo</button><button class="secondary-btn" id="printShare">Share Photo</button></div><button class="print-customize" id="printCustomize">Personalize your print</button></div></div></div><div class="confetti" id="confetti"></div><div class="toast" id="toast" role="status"></div>
+  <div class="modal-wrap faq-modal" id="faqModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="faqTitle">
+    <section class="faq-card">
+      <header class="preview-header">
+        <div><p class="faq-kicker">A LITTLE HELP</p><h2 id="faqTitle">Frequently asked questions</h2></div>
+        <button class="icon-btn" id="closeFaq" type="button" aria-label="Close frequently asked questions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      </header>
+      <details class="faq-item" open>
+        <summary>How does the online photobooth work?</summary>
+        <p>It all happens in your browser. Allow camera access, choose your session settings and photo style, then take your pictures. Your photo strip is put together for you to download or share.</p>
+      </details>
+    </section>
+  </div>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

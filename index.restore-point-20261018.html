@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f5f0" />
+  <meta name="description" content="Your own little photo studio. Make a memory with Snappy Baby." />
+  <title>Snappy Baby — your little photo studio</title>
+
+</head>
+<body>
+  <main class="welcome-screen" id="welcomeScreen" aria-labelledby="welcomeTitle">
+<span class="welcome-cursor-halo" id="cursorHalo" aria-hidden="true"></span>
+    <span class="welcome-full-flash" id="welcomeFullFlash" aria-hidden="true"></span>
+    <header class="welcome-header">
+      <a class="welcome-brand" href="#welcomeTitle" aria-label="Snappy Baby home"><span class="welcome-brand-name"><span class="ios-reveal" style="--i:0">Snappy Baby</span></span></a>
+      <nav class="welcome-nav" aria-label="Main navigation"><a href="#welcomeTitle"><span class="ios-reveal" style="--i:1">About</span></a><a href="#welcomeGallery"><span class="ios-reveal" style="--i:2">Gallery</span></a><a href="#beginBooth"><span class="ios-reveal" style="--i:3">Contact</span></a></nav>
+    </header>
+    <section class="welcome-content">
+      <div class="welcome-copy">
+        <div class="welcome-kicker"><span class="welcome-sparkle" aria-hidden="true">✦</span><span class="ios-reveal" style="--i:4">YOUR LITTLE PHOTO STUDIO</span><span class="welcome-sparkle" aria-hidden="true">✦</span></div>
+        <h1 id="welcomeTitle"><span class="ios-reveal" style="--i:5">Your memories</span><br/><span class="ios-reveal" style="--i:6"><em>start here.</em></span></h1>
+        <p class="welcome-slogan"><span class="ios-reveal" style="--i:7">Your own Korean-style photo booth.<br class="desktop-break"/> Simple, fun, and all yours.</span></p>
+        <button type="button" class="welcome-cta" id="beginBooth"><span class="ios-reveal" style="--i:8">Begin Snappy Baby</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+        <p class="welcome-promise"><span class="ios-reveal" style="--i:9">FOUR PHOTOS <span>·</span> ONE LITTLE KEEPSAKE</span></p>
+      </div>
+      <div class="welcome-visual" id="welcomeGallery">
+        <span class="welcome-sample-label"><span class="ios-reveal" style="--i:10">A LITTLE PREVIEW</span></span>
+        <div class="welcome-art">
+          <span class="welcome-star star-one" aria-hidden="true">✦</span><span class="welcome-star star-two" aria-hidden="true">✧</span><span class="welcome-star star-three" aria-hidden="true">·</span>
+          <div class="welcome-camera"><div class="welcome-camera-top"><span></span><i></i></div><button type="button" class="welcome-camera-lens" id="welcomeLens" aria-label="Trigger a camera flash"><span></span></button><div class="welcome-camera-slot"></div></div><div class="welcome-lens-cue" aria-hidden="true"><svg viewBox="0 0 40 24" fill="none"><path class="welcome-lens-cue-line" d="M36 12C25 5 15 5 4 12"/><path class="welcome-lens-cue-arrow" d="m14 4-10 8 10 8"/></svg><span class="ios-reveal" style="--i:11">Tap the lens</span></div>
+          <div class="welcome-photo" aria-hidden="true"><div class="welcome-sample-grid"><span></span><span></span><span></span><span></span></div><small>SNAPPY BABY · FOUR CUTS</small></div>
+        </div>
+        <p class="welcome-visual-caption"><span class="ios-reveal" style="--i:12">Four frames, one favorite moment.</span></p>
+      </div>
+    </section>
+
+  </main>
+  <section class="loading-screen hidden" id="loadingScreen" aria-hidden="true" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">
+    <div class="loading-content" id="loadingContent">
+      <span class="loading-lens" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="17.5"/><circle cx="24" cy="24" r="10.5"/><circle cx="24" cy="24" r="3.5"/></svg></span>
+      <p class="loading-message" id="loadingStatus">Setting up your booth...</p>
+      <span class="loading-track" aria-hidden="true"><span></span></span>
+    </div>
+    <div class="loading-error hidden" id="loadingError">
+      <span class="loading-error-lens" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="17.5"/><circle cx="24" cy="24" r="10.5"/><path d="M24 18v7m0 5h.01"/></svg></span>
+      <h1>We can't see your camera yet</h1>
+      <p id="loadingErrorText">In your browser, open the site controls near the address bar, allow Camera access, then try again.</p>
+      <div class="loading-error-actions"><button type="button" class="loading-action primary" id="retryCamera">Try again</button><button type="button" class="loading-action" id="backHome">Back to home</button></div>
+    </div>
+  </section>
+  <div class="app-shell hidden" id="boothApp" aria-hidden="true">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Snappy Baby home"><span class="brand-name">snappy<span> baby</span></span></a>
+      <span class="session-label">YOUR LITTLE PHOTO STUDIO</span><div class="top-right"><button class="icon-btn" id="themeMode" aria-label="Toggle dark mode" title="Toggle dark mode"><svg id="modeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/></svg></button><button class="icon-btn" id="settingsFocus" aria-label="Focus session settings" title="Session settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1a1.7 1.7 0 0 1-2.4 2.4l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a1.7 1.7 0 0 1-3.4 0v-.2a1.7 1.7 0 0 0-2.9-1.2l-.1.1a1.7 1.7 0 0 1-2.4-2.4l.1-.1A1.7 1.7 0 0 0 4.2 12H4a1.7 1.7 0 0 1 0-3.4h.2a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a1.7 1.7 0 0 1 2.4-2.4l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a1.7 1.7 0 0 1 3.4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a1.7 1.7 0 0 1 2.4 2.4l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a1.7 1.7 0 0 1 0 3.4h-.2a1.7 1.7 0 0 0-1.2 2.9Z"/></svg></button></div>
+    </header>
+    <main class="main" id="cameraScreen">
+      <section class="left-column">
+        <div class="intro"><p class="eyebrow">A little moment, made yours</p><h1>Good things<br/>come in fours.</h1><p>Get comfy, find your light, and make a tiny keepsake worth keeping.</p></div>
+        <div class="camera-shell">
+          <div class="camera-view" id="cameraView">
+            <div class="scene-fallback" id="fallback"><div class="scene-wall"></div><div class="scene-person"><div class="scene-body"></div><div class="scene-neck"></div><div class="scene-head"></div><div class="scene-hair"></div></div><span class="scene-flower one">✿</span><span class="scene-flower two">✿</span></div>
+            <video id="camera" autoplay playsinline muted class="hidden"></video>
+            <div class="view-top"><span class="live-pill"><i class="live-dot"></i><span id="cameraStatus">STUDIO VIEW</span></span><div class="view-actions"><button class="glass-btn" id="suggestPose" title="Suggest a pose" aria-label="Suggest a pose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3.5 13.7 9l5.3 1.7-5.3 1.7L12 18l-1.7-5.6L5 10.7 10.3 9 12 3.5Z"/><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg></button><button class="glass-btn" id="switchCamera" title="Switch camera" aria-label="Switch camera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9A7 7 0 0 1 18 6l2 2M4 16l2 2a7 7 0 0 0 12.4-3"/></svg></button></div></div>
+            <div class="view-bottom"><span class="pose-tip" id="poseTip"><span class="pose-tip-sparkle" aria-hidden="true">✦</span><span class="pose-tip-label">POSE COACH</span><span id="poseTipText">Smile naturally</span></span></div><div class="countdown" id="countdown" aria-live="assertive"><span class="countdown-number">3</span></div><div class="flash" id="flash"></div>
+          </div>
+          <div class="camera-under"><div class="progress-row"><span class="progress-text" id="progressText">Ready when you are</span><span class="progress-track"><span class="progress-fill" id="progressFill"></span></span></div><div class="capture-row"><div class="capture-side"><b>3 sec</b>countdown</div><button class="shutter" id="shutter" aria-label="Start photo session"></button><div class="capture-side"><b>4 photos</b>2 sec apart</div></div><p class="status" id="status" aria-live="polite"></p></div>
+        </div>
+      </section>
+      <section class="settings" aria-label="Photo strip settings">
+        <div class="section-head"><span class="section-title">Pick your frame</span><span class="section-note">A little theme goes a long way</span></div>
+        <div class="themes" id="themes">
+          <button class="theme-card active" data-theme="classic"><span class="theme-art"><span></span></span><span class="theme-label">Classic</span></button>
+          <button class="theme-card" data-theme="midnight"><span class="theme-art midnight"><span></span></span><span class="theme-label">Midnight Film</span></button>
+          <button class="theme-card" data-theme="pastel"><span class="theme-art pastel"><span></span></span><span class="theme-label">Pastel</span></button>
+          <button class="theme-card" data-theme="birthday"><span class="theme-art birthday"><span></span></span><span class="theme-label">Birthday</span></button>
+          <button class="theme-card" data-theme="graduation"><span class="theme-art graduation"><span></span></span><span class="theme-label">Grad</span></button>
+          <button class="theme-card" data-theme="wedding"><span class="theme-art wedding"><span></span></span><span class="theme-label">Wedding</span></button>
+          <button class="theme-card" data-theme="halloween"><span class="theme-art halloween"><span></span></span><span class="theme-label">Halloween</span></button>
+          <button class="theme-card" data-theme="christmas"><span class="theme-art christmas"><span></span></span><span class="theme-label">Christmas</span></button>
+          <button class="theme-card" data-theme="minimal"><span class="theme-art minimal"><span></span></span><span class="theme-label">Minimalist</span></button>
+          <button class="theme-card" data-theme="cream"><span class="theme-art cream"><span></span></span><span class="theme-label">Cream</span></button>
+          <button class="theme-card" data-theme="lavender"><span class="theme-art lavender"><span></span></span><span class="theme-label">Lavender</span></button>
+          <button class="theme-card" data-theme="sky"><span class="theme-art sky"><span></span></span><span class="theme-label">Sky</span></button>
+          <button class="theme-card" data-theme="film"><span class="theme-art film"><span></span></span><span class="theme-label">Film</span></button>
+          <button class="theme-card" data-theme="vintage"><span class="theme-art vintage"><span></span></span><span class="theme-label">Vintage</span></button>
+          <button class="theme-card" data-theme="valentines"><span class="theme-art valentines"><span></span></span><span class="theme-label">Valentine's</span></button>
+        </div>
+        <div class="section-head"><span class="section-title">Set the mood</span><span class="section-note">You can change this anytime</span></div>
+        <div class="filters" id="filters"><button class="filter-chip" data-filter="original">Original</button><button class="filter-chip active" data-filter="bw">B&amp;W</button><button class="filter-chip" data-filter="vintage">Vintage</button><button class="filter-chip" data-filter="warm">Warm</button><button class="filter-chip" data-filter="cool">Cool</button><button class="filter-chip" data-filter="soft">Soft</button><button class="filter-chip" data-filter="rose">Rose</button><button class="filter-chip" data-filter="film">Film</button><button class="filter-chip" data-filter="fade">Fade</button><button class="filter-chip" data-filter="crisp">Crisp</button><button class="filter-chip" data-filter="lavender">Lavender</button><button class="filter-chip" data-filter="golden">Golden</button><button class="filter-chip" data-filter="matte">Matte</button><button class="filter-chip" data-filter="sepia">Sepia</button><button class="filter-chip" data-filter="dreamy">Dreamy</button><button class="filter-chip" data-filter="y2k">Y2K</button><button class="filter-chip" data-filter="noir">Noir</button><button class="filter-chip" data-filter="glow">Glow</button><button class="filter-chip" data-filter="peach">Peach</button></div>
+        <div class="section-head"><span class="section-title">Make it yours</span><span class="section-note">Add a little note</span></div>
+        <div class="customize"><input class="custom-input" id="caption" maxlength="30" placeholder="Write a little something…" aria-label="Custom strip text"/><div class="toggle-row"><label class="toggle"><input type="checkbox" id="showDate" checked/> Date</label><label class="toggle"><input type="checkbox" id="showTime"/> Time</label></div></div>
+      </section>
+    </main>
+    <footer class="footer"><span class="footer-brand">SEOUL-STYLE SELF PHOTO STUDIO</span><span>Snappy Baby Studio · 01</span></footer>
+  </div>
+  <div class="modal-wrap" id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewTitle"><div class="preview-card"><div class="preview-header"><div><h2 id="previewTitle">Your little keepsake</h2><p>Take a peek. Make it yours.</p></div><button class="icon-btn" id="closePreview" aria-label="Close preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="preview-content"><div class="strip-stage"><canvas id="stripCanvas" class="strip-canvas" aria-label="Photo strip preview"></canvas></div><div class="preview-options"><div><div class="option-label">CURRENT TEMPLATE</div><div class="preview-theme-name" id="previewTheme">Classic</div><div class="frame-picker" id="previewThemeChoices"></div></div><div><div class="option-label">A NOTE ON YOUR STRIP</div><input class="custom-input" id="previewCaption" maxlength="30" placeholder="Write a little something…" aria-label="Preview strip text"/></div><div class="date-line"><label class="toggle"><input type="checkbox" id="previewDate" checked/> Date</label><label class="toggle"><input type="checkbox" id="previewTime"/> Time</label><span style="flex:1"></span><span class="option-label" id="datePreview"></span></div><div class="preview-actions"><button class="primary-btn" id="saveStrip">↓ &nbsp; Download photo strip</button><button class="secondary-btn" id="shareStrip">↗ &nbsp; Share your strip</button><button class="secondary-btn" id="retake">↺ &nbsp; Retake photos</button><button class="secondary-btn" id="newStrip">＋ &nbsp; Create a new strip</button></div><p class="tiny-note">A little memory, ready to go wherever you do.</p></div></div></div></div>
+  <div class="print-theater" id="printTheater" aria-hidden="true"><div class="print-theater-inner"><div class="print-title"><span class="print-kicker">A LITTLE MOMENT, MADE YOURS</span><h2>Making your keepsake</h2><p>Your photos are on their way.</p><span class="print-processing"><i></i>Preparing your photos</span></div><div class="printer-scene"><div class="printer-body"><div class="printer-top"><span class="printer-brand">SNAPPY BABY</span><span class="printer-light"></span></div><div class="printer-face"><span class="printer-lens"></span><span class="printer-status">PHOTO STUDIO · 01</span></div><div class="printer-slot"><span></span></div></div><div class="print-feed-window"><div class="print-paper"><img id="printPhoto" alt="Your finished photobooth collage" /></div></div></div><div class="print-actions" id="printActions"><p>Save a copy or share this little memory.</p><div class="print-action-row"><button class="primary-btn" id="printSave">Save Photo</button><button class="secondary-btn" id="printShare">Share Photo</button></div><button class="print-customize" id="printCustomize">Personalize your print</button></div></div></div><div class="confetti" id="confetti"></div><div class="toast" id="toast" role="status"></div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
