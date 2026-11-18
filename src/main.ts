@@ -6,6 +6,18 @@ import { setScreenVisibility } from './screens/flow';
 import type { CameraFacing, DesignStyle, Filter, LayoutGeometry, LayoutName, PhotoBox, PhotoStrip, PortraitFrame, Sticker, ThemeInfo, ThemeName } from './types';
 
 type SavePickerResult = { handle: SaveFileHandle } | { error: unknown };
+type BoothStep = 'setup' | 'shoot' | 'customize' | 'done';
+
+const boothSteps: readonly BoothStep[] = ['setup', 'shoot', 'customize', 'done'];
+const boothStepLabels: Record<BoothStep, string> = {
+  setup: 'Setup',
+  shoot: 'Shoot',
+  customize: 'Customize',
+  done: 'Done',
+};
+function isBoothStep(value: string | undefined): value is BoothStep {
+  return value === 'setup' || value === 'shoot' || value === 'customize' || value === 'done';
+}
 
 function errorProperty(error: unknown, property: 'name' | 'message'): string | undefined {
   if (typeof error !== 'object' || error === null) return undefined;
@@ -21,7 +33,7 @@ function errorName(error: unknown): string | undefined {
   function $(selector:'#camera',root?:ParentNode):HTMLVideoElement;
   function $(selector:'#stripCanvas',root?:ParentNode):HTMLCanvasElement;
   function $(selector:'#printPhoto',root?:ParentNode):HTMLImageElement;
-  function $(selector:'#shutter'|'#switchCamera'|'#timerControl'|'#flashToggle'|'#beginBooth'|'#settingsFocus'|'#suggestPose'|'#themeMode'|'#faqButton'|'#closeFaq'|'#welcomeLens'|'#retryCamera'|'#backHome'|'#closePreview'|'#saveStrip'|'#shareStrip'|'#retake'|'#newStrip'|'#printSave'|'#printShare'|'#printCustomize',root?:ParentNode):HTMLButtonElement;
+  function $(selector:'#shutter'|'#switchCamera'|'#timerControl'|'#flashToggle'|'#beginBooth'|'#settingsFocus'|'#suggestPose'|'#themeMode'|'#faqButton'|'#closeFaq'|'#welcomeLens'|'#retryCamera'|'#backHome'|'#closePreview'|'#saveStrip'|'#shareStrip'|'#retake'|'#newStrip'|'#printSave'|'#printShare'|'#printCustomize'|'#printTakeAnother',root?:ParentNode):HTMLButtonElement;
   function $(selector:'#caption'|'#previewCaption'|'#captionTextColor'|'#dateTimeTextColor'|'#showDate'|'#showTime'|'#previewDate'|'#previewTime',root?:ParentNode):HTMLInputElement;
   function $(selector:'#photoCountSelect'|'#shotIntervalSelect',root?:ParentNode):HTMLSelectElement;
   function $<T extends Element=HTMLElement>(selector:string,root?:ParentNode):T;
@@ -41,7 +53,49 @@ function errorName(error: unknown): string | undefined {
     return closest;
   };
   const video=$<HTMLVideoElement>('#camera'),fallback=$('#fallback'), shutter=$<HTMLButtonElement>('#shutter'), countdown=$('#countdown .countdown-number'),countdownOverlay=$('#countdown');
-  let stream:MediaStream|null=null,facing:CameraFacing='user',busy=false,photos:string[]=[],stickers:Sticker[]=[],selectedTheme:ThemeName='classic',selectedFilter:Filter='bw',selectedLayout:LayoutName='strip',countdownSeconds=3,photoCount=4,shotInterval=2,flashEnabled=true,designStyle:DesignStyle='none',capturedAt=new Date(),audioContext:AudioContext|null=null,draggedSticker=-1,customCaptionColor=false,customDateTimeColor=false;
+  let stream:MediaStream|null=null,facing:CameraFacing='user',busy=false,photos:string[]=[],stickers:Sticker[]=[],selectedTheme:ThemeName='classic',selectedFilter:Filter='bw',selectedLayout:LayoutName='strip',countdownSeconds=3,photoCount=4,shotInterval=2,flashEnabled=true,designStyle:DesignStyle='none',capturedAt=new Date(),audioContext:AudioContext|null=null,draggedSticker=-1,customCaptionColor=false,customDateTimeColor=false,currentStep:BoothStep='setup';
+  const stepper=$<HTMLElement>('#boothStepper');
+  const stepItems=Array.from(stepper.querySelectorAll<HTMLLIElement>('.stepper-step')).map(item=>{
+    const step=item.dataset.step;
+    const button=item.querySelector<HTMLButtonElement>('.stepper-button');
+    const description=item.querySelector<HTMLElement>('.stepper-visually-hidden');
+    if(!isBoothStep(step)||!button||!description)throw new Error('Invalid booth progress step markup.');
+    return{item,button,description,step};
+  });
+  let stepPulseTimer:ReturnType<typeof setTimeout>|null=null;
+  function renderStepper():void{
+    const currentIndex=boothSteps.indexOf(currentStep);
+    stepItems.forEach(({item,button,description,step},index)=>{
+      const current=index===currentIndex,complete=index<currentIndex;
+      item.classList.toggle('is-current',current);
+      item.classList.toggle('is-complete',complete);
+      item.classList.toggle('is-upcoming',index>currentIndex);
+      if(current)item.setAttribute('aria-current','step');else item.removeAttribute('aria-current');
+      const canReturnToSetup=step==='setup'&&complete&&!busy&&photos.length===0;
+      button.disabled=!canReturnToSetup;
+      description.textContent=`Step ${index+1} of ${boothSteps.length}: ${boothStepLabels[step]}, ${current?'current':complete?'completed':'upcoming'}`;
+    });
+  }
+  function setCurrentStep(step:BoothStep):void{
+    if(step===currentStep)return;
+    const movingForward=boothSteps.indexOf(step)>boothSteps.indexOf(currentStep);
+    currentStep=step;
+    stepper.style.setProperty('--stepper-delay',movingForward?'400ms':'0ms');
+    renderStepper();
+    if(stepPulseTimer)clearTimeout(stepPulseTimer);
+    const activeStep=stepper.querySelector<HTMLLIElement>(`[data-step="${step}"]`);
+    if(!activeStep)return;
+    activeStep.classList.add('is-pulsing');
+    stepPulseTimer=setTimeout(()=>activeStep.classList.remove('is-pulsing'),800);
+  }
+  function placeStepperInBooth():void{$('#boothApp').insertBefore(stepper,$('#cameraScreen'))}
+  renderStepper();
+  stepItems.find(({step})=>step==='setup')?.button.addEventListener('click',()=>{
+    if(busy||photos.length||currentStep==='setup')return;
+    setCurrentStep('setup');
+    $('#timerControl').focus({preventScroll:true});
+  });
+  $('#beginBooth').addEventListener('click',()=>setCurrentStep('setup'));
   const themeInfo:Record<string,ThemeInfo>={classic:{name:'Classic',title:'A LITTLE MOMENT',color:'#fffefa',ink:'#48423e',accent:'#d8a69c',decoration:'♡'},pastel:{name:'Pastel',title:'LITTLE MOMENTS',color:'#f6f7fc',ink:'#3d4656',accent:'#aab9dc',decoration:'✦'},birthday:{name:'Birthday',title:'HAPPY BIRTHDAY',color:'#fff5f8',ink:'#624653',accent:'#d68fa9',decoration:'✦'},graduation:{name:'Graduation',title:'THE NEXT CHAPTER',color:'#f7f6fb',ink:'#39394c',accent:'#646488',decoration:'✧'},wedding:{name:'Wedding',title:'TO HAVE & TO HOLD',color:'#fffaf1',ink:'#665947',accent:'#c8ad7d',decoration:'❀'},halloween:{name:'Halloween',title:'SPOOKY LITTLE MOMENTS',color:'#fff5e9',ink:'#573b2d',accent:'#bd7540',decoration:'✦'},christmas:{name:'Christmas',title:'MERRY & BRIGHT',color:'#f1f8f1',ink:'#405a49',accent:'#a35c5c',decoration:'❄'},minimal:{name:'Minimalist',title:'SNAPPY BABY',color:'#fffefa',ink:'#383838',accent:'#bbb8b0',decoration:''},cream:{name:'Cream',title:'SUNDAY IN THE SUN',color:'#fbf3e6',ink:'#514638',accent:'#c7a874',decoration:'✧'},lavender:{name:'Lavender',title:'A SOFT LITTLE DAY',color:'#f5f0fb',ink:'#4f4261',accent:'#ad94ca',decoration:'✦'},sky:{name:'Sky',title:'CLOUD NINE',color:'#eff7fb',ink:'#385363',accent:'#87b7d1',decoration:'☁'},film:{name:'Film',title:'MEMORIES IN FRAME',color:'#f5f0e5',ink:'#443e34',accent:'#9c8055',decoration:'✦'},vintage:{name:'Vintage',title:'THE GOOD OLD DAYS',color:'#f4ead7',ink:'#534438',accent:'#a88557',decoration:'❧'},valentines:{name:"Valentine's",title:'LOVE YOU, ALWAYS',color:'#fff1f3',ink:'#743e50',accent:'#d78a9e',decoration:'♡'}};
   themeInfo.midnight={name:'Midnight Film',title:'MIDNIGHT MEMORIES',color:'#171415',ink:'#eadfc8',accent:'#d8b675',decoration:'✦'};
   function isThemeName(value:string|undefined):value is ThemeName{return value!==undefined&&Object.hasOwn(themeInfo,value)}
@@ -49,17 +103,18 @@ function errorName(error: unknown): string | undefined {
   function isLayoutName(value:string|undefined):value is LayoutName{return value==='portrait'||value==='strip'||value==='grid'||value==='wide'||value==='film'||value==='mosaic'}
   function isDesignStyle(value:string|undefined):value is DesignStyle{return value==='none'||value==='sparkles'||value==='hearts'||value==='flowers'}
   const themeButtons=$$<HTMLButtonElement>('#themes .theme-card');
+  themeButtons.forEach(button=>{button.type='button';button.setAttribute('aria-pressed',String(button.classList.contains('active')))});
   $('#previewThemeChoices').remove();
   const layoutPanel=document.createElement('section');layoutPanel.className='layout-panel';layoutPanel.innerHTML='<div class="option-label">PHOTO LAYOUT · TAP TO CHANGE</div><div class="layout-picker"></div>';
   const layoutOptions=[['portrait','▯','Portrait strip'],['strip','▯','Classic strip'],['grid','▦','2 × 2 grid'],['wide','▤','Wide grid'],['film','▥','Film row'],['mosaic','▧','Mosaic']];
   $('.layout-picker',layoutPanel).innerHTML=layoutOptions.map(([id,icon,label])=>`<button type="button" class="layout-choice${id==='strip'?' active':''}" data-layout="${id}"><span>${icon}</span>${label}</button>`).join('');
-  $$<HTMLButtonElement>('.layout-choice',layoutPanel).forEach(b=>b.addEventListener('click',()=>{if(isLayoutName(b.dataset.layout))selectedLayout=b.dataset.layout;$$<HTMLButtonElement>('.layout-choice',layoutPanel).forEach(x=>x.classList.toggle('active',x===b));renderStrip()}));
+  $$<HTMLButtonElement>('.layout-choice',layoutPanel).forEach(b=>{b.type='button';b.setAttribute('aria-pressed',String(b.classList.contains('active')));b.addEventListener('click',()=>{if(isLayoutName(b.dataset.layout))selectedLayout=b.dataset.layout;$$<HTMLButtonElement>('.layout-choice',layoutPanel).forEach(x=>{const active=x===b;x.classList.toggle('active',active);x.setAttribute('aria-pressed',String(active))});renderStrip()})});
   const decoratePanel=document.createElement('section');decoratePanel.className='decorate-panel';decoratePanel.innerHTML='<div class="decorate-heading"><span class="option-label">ADD A LITTLE EXTRA</span><button class="clear-stickers" type="button">Clear stickers</button></div><div class="design-picker" aria-label="Decorative design"></div><div class="decorate-heading sticker-heading"><span class="option-label">STICKERS · DRAG TO MOVE</span></div><div class="sticker-picker" aria-label="Add a sticker"></div>';
   const designOptions=[['none','None'],['sparkles','✦ Sparkles'],['hearts','♡ Hearts'],['flowers','✿ Flowers']];
   $('.design-picker',decoratePanel).innerHTML=designOptions.map(([id,label])=>`<button type="button" class="design-choice${id==='none'?' active':''}" data-design="${id}">${label}</button>`).join('');
   [['✨','Sparkle'],['💖','Heart'],['🌼','Flower'],['🎀','Bow'],['⭐','Star'],['🧸','Bear'],['🌈','Rainbow'],['🍒','Cherries']].forEach(([emoji,label])=>{const b=document.createElement('button');b.type='button';b.className='sticker-choice';b.textContent=emoji;b.title='Add '+label;b.setAttribute('aria-label','Add '+label+' sticker');$('.sticker-picker',decoratePanel).append(b)});
   $$<HTMLButtonElement>('.sticker-choice',decoratePanel).forEach(b=>b.addEventListener('click',()=>{const emoji=b.textContent;if(!emoji)return;stickers.push({emoji,x:stickers.length%2?.78:.22,y:.11+(stickers.length%6)*.13,size:54});renderStrip()}));
-  $$<HTMLButtonElement>('.design-choice',decoratePanel).forEach(b=>b.addEventListener('click',()=>{if(isDesignStyle(b.dataset.design))designStyle=b.dataset.design;$$<HTMLButtonElement>('.design-choice',decoratePanel).forEach(x=>x.classList.toggle('active',x===b));renderStrip()}));
+  $$<HTMLButtonElement>('.design-choice',decoratePanel).forEach(b=>{b.type='button';b.setAttribute('aria-pressed',String(b.classList.contains('active')));b.addEventListener('click',()=>{if(isDesignStyle(b.dataset.design))designStyle=b.dataset.design;$$<HTMLButtonElement>('.design-choice',decoratePanel).forEach(x=>{const active=x===b;x.classList.toggle('active',active);x.setAttribute('aria-pressed',String(active))});renderStrip()})});
   $('.clear-stickers',decoratePanel).addEventListener('click',()=>{stickers=[];renderStrip()});
   const homeSettings=$('.settings'),sectionHeads=$$<HTMLElement>('.section-head',homeSettings),themeGrid=$('#themes'),filterTray=$('#filters'),captionControls=$('.customize'),previewOptions=$('.preview-options');
   $('.section-title',sectionHeads[0]).textContent='Choose a template';$('.section-note',sectionHeads[0]).textContent='Pick the frame for your strip';
@@ -71,10 +126,13 @@ function errorName(error: unknown): string | undefined {
   textColorPanel.className='text-color-panel';textColorPanel.innerHTML='<label class="text-color-control"><span>Caption color</span><input type="color" id="captionTextColor" value="'+themeInfo[selectedTheme].ink+'" aria-label="Choose caption text color"></label><label class="text-color-control"><span>Date &amp; time color</span><input type="color" id="dateTimeTextColor" value="'+themeInfo[selectedTheme].ink+'" aria-label="Choose date and time text color"></label>';
   previewOptions.replaceChildren(layoutPanel,sectionHeads[0],themeGrid,themeSummary,sectionHeads[1],filterTray,sectionHeads[2],captionControls,textColorPanel,dateLine,decoratePanel,previewActions,previewNote);
   homeSettings.classList.remove('hidden');$('#cameraScreen').classList.add('camera-only');document.body.classList.add('camera-fit');$('.app-shell').classList.add('camera-fit');homeSettings.classList.add('studio-settings');
-  const panelMarkup='<p class="studio-kicker">YOUR SESSION</p><h2 class="studio-panel-title">Ready when you are</h2><fieldset class="capture-setting countdown-setting"><legend>Countdown</legend><div class="countdown-options"><label><input type="radio" name="studioCountdown" value="0"><span>Off</span></label><label><input type="radio" name="studioCountdown" value="3" checked><span>3 sec</span></label><label><input type="radio" name="studioCountdown" value="5"><span>5 sec</span></label><label><input type="radio" name="studioCountdown" value="10"><span>10 sec</span></label></div></fieldset><div class="studio-selects"><label class="capture-setting">Number of photos<select id="photoCountSelect"><option value="2">2 photos</option><option value="4" selected>4 photos</option></select></label><label class="capture-setting">Time between shots<select id="shotIntervalSelect"><option value="1">1 second</option><option value="2" selected>2 seconds</option><option value="3">3 seconds</option></select></label></div><div class="studio-start-slot"></div><div class="studio-progress"><div class="shot-dots" id="shotDots" role="list" aria-label="Photo progress"></div></div><p class="status" id="status" aria-live="polite"></p>';
-  homeSettings.innerHTML=panelMarkup;const studioStartSlot=$('.studio-start-slot',homeSettings),progressRow=$('.progress-row'),captureRow=$('.capture-row'),studioStatus=$('.camera-under .status');captureRow.replaceChildren(shutter);studioStartSlot.append(shutter);$('.studio-progress',homeSettings).before(progressRow);$('.studio-progress',homeSettings).after(studioStatus);$('.camera-under').remove();
-  const quickFrameRow=document.createElement('div');quickFrameRow.className='toolbar-group frame-toolbar';quickFrameRow.innerHTML='<span class="toolbar-label">FRAME</span><button type="button" class="start-template-choice active" data-theme="classic" aria-pressed="true">Classic</button><button type="button" class="start-template-choice" data-theme="minimal" aria-pressed="false">Modern</button><button type="button" class="start-template-choice" data-theme="film" aria-pressed="false">Film</button>';const homeTemplateButtons=$$<HTMLButtonElement>('.start-template-choice',quickFrameRow);const clonedFilterTray=filterTray.cloneNode(true);if(!(clonedFilterTray instanceof HTMLElement))throw new Error('Could not clone filter controls.');const homeFilterTray=clonedFilterTray;homeFilterTray.removeAttribute('id');homeFilterTray.classList.add('start-filter-tray');const favoriteFilters:Filter[]=['original','warm','vintage','golden','bw','soft','rose','lavender'];$$<HTMLButtonElement>('.filter-chip',homeFilterTray).forEach(chip=>{if(!isFilter(chip.dataset.filter)||!favoriteFilters.includes(chip.dataset.filter))chip.remove()});const moodGroup=document.createElement('div');moodGroup.className='toolbar-group mood-toolbar';moodGroup.innerHTML='<span class="toolbar-label">MOOD</span>';moodGroup.append(homeFilterTray);const studioToolbar=document.createElement('section');studioToolbar.className='studio-toolbar';studioToolbar.setAttribute('aria-label','Photo style');studioToolbar.append(quickFrameRow,moodGroup);$('#cameraScreen').insertAdjacentElement('afterend',studioToolbar);
-  const cameraControlRow=document.createElement('div');cameraControlRow.className='camera-controls';cameraControlRow.innerHTML='<button class="camera-control active" id="flashToggle" type="button" aria-pressed="true"><span class="camera-control-icon">✧</span><span>Flash</span></button><button class="camera-control" id="timerControl" type="button"><span class="camera-control-icon">◷</span><span id="timerLabel">Timer · 3s</span></button>';const existingSwitch=$('#switchCamera');cameraControlRow.append(existingSwitch);$('.camera-shell').insertAdjacentElement('afterend',cameraControlRow);const switchControl=existingSwitch.closest('.view-actions');if(switchControl&&!switchControl.children.length)switchControl.remove();
+  const panelMarkup='<p class="studio-kicker">YOUR SESSION</p><h2 class="studio-panel-title">Ready when you are</h2><fieldset class="capture-setting countdown-setting"><legend>Countdown</legend><div class="countdown-options"><label><input type="radio" name="studioCountdown" value="0"><span>Off</span></label><label><input type="radio" name="studioCountdown" value="3" checked><span>3 sec</span></label><label><input type="radio" name="studioCountdown" value="5"><span>5 sec</span></label><label><input type="radio" name="studioCountdown" value="10"><span>10 sec</span></label></div></fieldset><div class="studio-selects"><label class="capture-setting">Number of photos<select id="photoCountSelect"><option value="2">2 photos</option><option value="4" selected>4 photos</option></select></label><label class="capture-setting">Time between shots<select id="shotIntervalSelect"><option value="1">1 second</option><option value="2" selected>2 seconds</option><option value="3">3 seconds</option></select></label></div><div class="studio-start-slot"></div><div class="studio-progress"><div class="shot-dots" id="shotDots" role="list" aria-label="Photo progress"></div></div>';
+  homeSettings.innerHTML=panelMarkup;const studioStartSlot=$('.studio-start-slot',homeSettings),studioProgress=$('.studio-progress',homeSettings),progressRow=$('.progress-row'),captureRow=$('.capture-row'),studioStatus=$('.camera-under .status');captureRow.replaceChildren(shutter);studioStartSlot.append(shutter);const captureFinish=document.createElement('div');captureFinish.className='studio-capture-finish';captureFinish.append(studioStartSlot,progressRow,studioProgress,studioStatus);homeSettings.append(captureFinish);$('.camera-under').remove();
+  const quickFrameRow=document.createElement('div');quickFrameRow.className='toolbar-group frame-toolbar';quickFrameRow.innerHTML='<span class="toolbar-label">FRAME</span><button type="button" class="start-template-choice active" data-theme="classic" aria-pressed="true">Classic</button><button type="button" class="start-template-choice" data-theme="minimal" aria-pressed="false">Modern</button><button type="button" class="start-template-choice" data-theme="film" aria-pressed="false">Film</button>';const homeTemplateButtons=$$<HTMLButtonElement>('.start-template-choice',quickFrameRow);const clonedFilterTray=filterTray.cloneNode(true);if(!(clonedFilterTray instanceof HTMLElement))throw new Error('Could not clone filter controls.');const homeFilterTray=clonedFilterTray;homeFilterTray.removeAttribute('id');homeFilterTray.classList.add('start-filter-tray');const favoriteFilters:Filter[]=['original','warm','vintage','golden','bw','soft','rose','lavender'];$$<HTMLButtonElement>('.filter-chip',homeFilterTray).forEach(chip=>{if(!isFilter(chip.dataset.filter)||!favoriteFilters.includes(chip.dataset.filter)){chip.remove();return}chip.type='button';chip.setAttribute('aria-pressed',String(chip.dataset.filter===selectedFilter))});const moodGroup=document.createElement('div');moodGroup.className='toolbar-group mood-toolbar';moodGroup.innerHTML='<span class="toolbar-label">MOOD</span>';moodGroup.append(homeFilterTray);const studioToolbar=document.createElement('section');studioToolbar.className='studio-toolbar';studioToolbar.setAttribute('aria-label','Photo style');studioToolbar.append(quickFrameRow,moodGroup);$('#cameraScreen').insertAdjacentElement('afterend',studioToolbar);
+  const updateMoodFade=():void=>{homeFilterTray.dataset.fadeLeft=String(homeFilterTray.scrollLeft>1);homeFilterTray.dataset.fadeRight=String(homeFilterTray.scrollLeft+homeFilterTray.clientWidth<homeFilterTray.scrollWidth-1)};
+  homeFilterTray.addEventListener('scroll',updateMoodFade,{passive:true});window.addEventListener('resize',updateMoodFade,{passive:true});updateMoodFade();
+  const cameraControlRow=document.createElement('div');cameraControlRow.className='camera-controls';cameraControlRow.innerHTML='<button class="camera-control active" id="flashToggle" type="button" aria-pressed="true"><span class="camera-control-icon">✧</span><span>Flash</span></button><button class="camera-control" id="timerControl" type="button"><span class="camera-control-icon">◷</span><span id="timerLabel">Timer · 3s</span></button>';const existingSwitch=$('#switchCamera');cameraControlRow.append(existingSwitch);const cameraShell=$('.camera-shell');cameraShell.append(cameraControlRow);const switchControl=existingSwitch.closest('.view-actions');if(switchControl&&!switchControl.children.length)switchControl.remove();
+  $$<HTMLButtonElement>('.filter-chip').forEach(button=>{button.type='button';button.setAttribute('aria-pressed',String(button.dataset.filter===selectedFilter))});
   
   const countdownChoices=$$<HTMLInputElement>('input[name="studioCountdown"]',homeSettings),timerLabel=$('#timerLabel');
   function setCountdown(seconds:string):void{countdownSeconds=Number(seconds);countdownChoices.forEach(input=>{input.checked=Number(input.value)===countdownSeconds});timerLabel.textContent=countdownSeconds?'Timer · '+countdownSeconds+'s':'Timer · Off';$('#timerControl').setAttribute('aria-label',countdownSeconds?'Timer set to '+countdownSeconds+' seconds. Click to change.':'Timer off. Click to change.')}
@@ -86,12 +144,27 @@ function errorName(error: unknown): string | undefined {
   $('#timerControl').addEventListener('click',()=>{const values=[3,5,10,0],index=values.indexOf(countdownSeconds);setCountdown(String(values[(index+1+values.length)%values.length]))});
   $('#settingsFocus').addEventListener('click',()=>$<HTMLInputElement>('input[name="studioCountdown"]:checked',homeSettings).focus());
   setCountdown(String(countdownSeconds));updateProgress(0);
-  const cameraShell=$('.camera-shell'),finePointer=window.matchMedia('(hover:hover) and (pointer:fine)');cameraShell.addEventListener('pointermove',event=>{if(!finePointer.matches)return;const rect=cameraShell.getBoundingClientRect(),x=(event.clientX-rect.left)/rect.width-.5,y=(event.clientY-rect.top)/rect.height-.5;cameraShell.style.setProperty('--tilt-x',(x*2.2)+'deg');cameraShell.style.setProperty('--tilt-y',(-y*2.2)+'deg')});cameraShell.addEventListener('pointerleave',()=>{cameraShell.style.setProperty('--tilt-x','0deg');cameraShell.style.setProperty('--tilt-y','0deg')});
-  function selectFilter(name:Filter){selectedFilter=name;$$<HTMLButtonElement>('.filter-chip').forEach(b=>b.classList.toggle('active',b.dataset.filter===name));video.style.setProperty('--live-filter',filterCss[name]);if(photos.length)renderStrip()}
+  const finePointer=window.matchMedia('(hover:hover) and (pointer:fine)');cameraShell.addEventListener('pointermove',event=>{if(!finePointer.matches)return;const rect=cameraShell.getBoundingClientRect(),x=(event.clientX-rect.left)/rect.width-.5,y=(event.clientY-rect.top)/rect.height-.5;cameraShell.style.setProperty('--tilt-x',(x*2.2)+'deg');cameraShell.style.setProperty('--tilt-y',(-y*2.2)+'deg')});cameraShell.addEventListener('pointerleave',()=>{cameraShell.style.setProperty('--tilt-x','0deg');cameraShell.style.setProperty('--tilt-y','0deg')});
+  function selectFilter(name:Filter):void{
+    selectedFilter=name;
+    $$<HTMLButtonElement>('.filter-chip').forEach(button=>{
+      const active=button.dataset.filter===name;
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
+    });
+    const activeChip=$$<HTMLButtonElement>('.filter-chip',homeFilterTray).find(button=>button.dataset.filter===name);
+    if(activeChip){
+      const trayRect=homeFilterTray.getBoundingClientRect(),chipRect=activeChip.getBoundingClientRect();
+      const scrollDelta=chipRect.left<trayRect.left?chipRect.left-trayRect.left:chipRect.right>trayRect.right?chipRect.right-trayRect.right:0;
+      if(scrollDelta)homeFilterTray.scrollBy({left:scrollDelta,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+    }
+    video.style.setProperty('--live-filter',filterCss[name]);
+    if(photos.length)renderStrip();
+  }
 
   $$<HTMLButtonElement>('.filter-chip',homeFilterTray).forEach(b=>b.addEventListener('click',()=>{if(isFilter(b.dataset.filter))selectFilter(b.dataset.filter)}));
   homeTemplateButtons.forEach(b=>b.addEventListener('click',()=>{const name=b.dataset.theme;if(!isThemeName(name))return;selectTheme(name);toast(themeInfo[name].name+' selected for your next collage')}));
-  function selectTheme(name:ThemeName):void{selectedTheme=name;themeButtons.forEach(b=>b.classList.toggle('active',b.dataset.theme===name));homeTemplateButtons.forEach(b=>{const active=b.dataset.theme===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});$('#previewTheme').textContent=themeInfo[name].name;if(!customCaptionColor)$<HTMLInputElement>('#captionTextColor').value=themeInfo[name].ink;if(!customDateTimeColor)$<HTMLInputElement>('#dateTimeTextColor').value=themeInfo[name].ink;if(photos.length)renderStrip()}
+  function selectTheme(name:ThemeName):void{selectedTheme=name;themeButtons.forEach(b=>{const active=b.dataset.theme===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});homeTemplateButtons.forEach(b=>{const active=b.dataset.theme===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});$('#previewTheme').textContent=themeInfo[name].name;if(!customCaptionColor)$<HTMLInputElement>('#captionTextColor').value=themeInfo[name].ink;if(!customDateTimeColor)$<HTMLInputElement>('#dateTimeTextColor').value=themeInfo[name].ink;if(photos.length)renderStrip()}
   function setStatus(text:string):void{$('#status').textContent=text}
   function toast(text:string):void{const t=$('#toast');t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
   let cameraAttempt=0;
@@ -103,11 +176,62 @@ const poses=['Move slightly left','Perfect lighting - stay here','Smile naturall
   $('#suggestPose').addEventListener('click',()=>{poseIndex=(poseIndex+1+Math.floor(Math.random()*(poses.length-1)))%poses.length;showPoseSuggestion(poses[poseIndex])});
   function sound(freq=880,duration=.09){try{audioContext=audioContext||new(window.AudioContext||window.webkitAudioContext)();const o=audioContext.createOscillator(),g=audioContext.createGain();o.connect(g);g.connect(audioContext.destination);o.frequency.value=freq;o.type='sine';g.gain.setValueAtTime(.09,audioContext.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+duration);o.start();o.stop(audioContext.currentTime+duration)}catch(e){}}
   function playShutterSound(){try{audioContext=audioContext||new(window.AudioContext||window.webkitAudioContext)();if(audioContext.state==='suspended')audioContext.resume();const now=audioContext.currentTime,oscillator=audioContext.createOscillator(),toneGain=audioContext.createGain(),noiseBuffer=audioContext.createBuffer(1,Math.ceil(audioContext.sampleRate*.065),audioContext.sampleRate),noiseData=noiseBuffer.getChannelData(0);for(let i=0;i<noiseData.length;i++)noiseData[i]=(Math.random()*2-1)*(1-i/noiseData.length);const noise=audioContext.createBufferSource(),filter=audioContext.createBiquadFilter(),noiseGain=audioContext.createGain();noise.buffer=noiseBuffer;filter.type='lowpass';filter.frequency.setValueAtTime(2600,now);noise.connect(filter);filter.connect(noiseGain);noiseGain.connect(audioContext.destination);noiseGain.gain.setValueAtTime(.0001,now);noiseGain.gain.exponentialRampToValueAtTime(.14,now+.004);noiseGain.gain.exponentialRampToValueAtTime(.0001,now+.065);oscillator.type='triangle';oscillator.frequency.setValueAtTime(1350,now);oscillator.frequency.exponentialRampToValueAtTime(360,now+.055);oscillator.connect(toneGain);toneGain.connect(audioContext.destination);toneGain.gain.setValueAtTime(.0001,now);toneGain.gain.exponentialRampToValueAtTime(.075,now+.003);toneGain.gain.exponentialRampToValueAtTime(.0001,now+.06);noise.start(now);noise.stop(now+.07);oscillator.start(now);oscillator.stop(now+.065)}catch(error){}}
-  function wait(ms:number):Promise<void>{return new Promise(resolve=>setTimeout(resolve,ms))}
-  function runPrintFeed():Promise<void>{const paper=$('.print-paper'),beats=[[0,0],[.08,.025],[.13,.05],[.17,.05],[.24,.12],[.3,.18],[.36,.18],[.44,.28],[.5,.36],[.57,.44],[.61,.44],[.69,.58],[.76,.68],[.82,.68],[.9,.84],[.95,.91],[1,1]],start=performance.now(),duration=window.matchMedia('(prefers-reduced-motion: reduce)').matches?1100:4550;return new Promise<void>(resolve=>{const frame:FrameRequestCallback=now=>{const time=Math.min(1,(now-start)/duration);let index=1;while(index<beats.length-1&&time>beats[index][0])index++;const [startTime,startProgress]=beats[index-1],[endTime,endProgress]=beats[index],segment=(time-startTime)/(endTime-startTime),ease=segment*segment*(3-2*segment),progress=startProgress+(endProgress-startProgress)*ease,wave=Math.sin(time*Math.PI*9),hang=Math.max(0,(progress-.18)/.82),rotation=wave*(.12+hang*1.15),vertical=wave*(.18+hang*.45);paper.style.setProperty('clip-path','inset(0 0 '+((1-progress)*100).toFixed(2)+'% 0 round 2px)','important');paper.style.transform='translate3d(0,'+vertical.toFixed(2)+'px,0) rotate('+rotation.toFixed(2)+'deg)';paper.style.setProperty('--paper-shadow-y',(8+hang*8)+'px');paper.style.setProperty('--paper-shadow-blur',(14+hang*12)+'px');paper.style.setProperty('--paper-shadow-alpha',(.16+hang*.1).toFixed(2));if(time<1)requestAnimationFrame(frame);else{paper.style.setProperty('clip-path','inset(0)','important');paper.style.transform='';resolve()}};requestAnimationFrame(frame)})}
+  function wait(ms:number):Promise<void>{
+    const skipPrintDelay=document.body.classList.contains('is-printing')&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return new Promise(resolve=>setTimeout(resolve,skipPrintDelay?0:ms));
+  }
+  function runPrintFeed():Promise<void>{
+    const paper=$('.print-paper'),reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    paper.style.removeProperty('clip-path');
+    if(reducedMotion){
+      paper.style.transform='rotate(-2deg)';
+      printTitle.textContent='Your little keepsake is ready.';
+      printSubtitle.textContent='Fresh from the booth, just for you.';
+      printTheater.classList.add('print-complete');
+      printStatus.textContent='Your photo strip is ready';
+      setCurrentStep('done');
+      return Promise.resolve();
+    }
+    const beats:[number,number][]=[[0,-100],[.12,-100],[.2,-82],[.28,-82],[.38,-58],[.46,-58],[.57,-34],[.65,-34],[.76,-12],[.86,3],[.93,-1],[1,0]],start=performance.now(),duration=3600;
+    return new Promise<void>(resolve=>{
+      const frame:FrameRequestCallback=now=>{
+        const time=Math.min(1,(now-start)/duration);
+        let index=1;
+        while(index<beats.length-1&&time>beats[index][0])index++;
+        const [startTime,startY]=beats[index-1],[endTime,endY]=beats[index],segment=(time-startTime)/(endTime-startTime),ease=segment*segment*(3-2*segment);
+        paper.style.transform='translateY('+((startY+(endY-startY)*ease).toFixed(2))+'%)';
+        if(time<1)requestAnimationFrame(frame);
+        else{paper.style.transform='rotate(-2deg)';resolve()}
+      };
+      requestAnimationFrame(frame);
+    });
+  }
   function tick(n:number):void{countdown.textContent=String(n);countdownOverlay.classList.remove('show');void countdownOverlay.offsetWidth;countdownOverlay.classList.add('show');const view=$('#cameraView');view.classList.remove('countdown-shake');void view.offsetWidth;view.classList.add('countdown-shake');setTimeout(()=>view.classList.remove('countdown-shake'),420);sound(n===0?1050:640,.11)}
   function fireFlash(){if(!flashEnabled)return;const flash=$('#flash');flash.classList.remove('fire');void flash.offsetWidth;flash.classList.add('fire')}
-  function updateProgress(n:number):void{const thumbs=$('#shotDots');$('#progressText').textContent=n?'Photo '+Math.min(n,photoCount):'Photo 1';$('#progressFill').style.width=(n/photoCount*100)+'%';if(thumbs){thumbs.style.setProperty('--shot-count',String(photoCount));thumbs.replaceChildren(...Array.from({length:photoCount},(_,i)=>{const thumb=document.createElement('div');thumb.className='shot-thumbnail'+(photos[i]?' captured':'');thumb.setAttribute('role','listitem');thumb.setAttribute('aria-label',photos[i]?'Photo '+(i+1)+' captured':'Photo '+(i+1)+' waiting');if(photos[i]){const image=document.createElement('img');image.src=photos[i];image.alt='Captured photo '+(i+1);thumb.append(image)}else{const number=document.createElement('span');number.textContent=String(i+1).padStart(2,'0');thumb.append(number)}return thumb}))}}
+  function updateProgress(n:number):void{
+    const thumbs=$('#shotDots'),currentIndex=n<photoCount&&photos.length===n?n:-1;
+    $('#progressText').textContent=n<photoCount?'Photo '+(n+1):'Photo '+photoCount;
+    $('#progressFill').style.width=(n/photoCount*100)+'%';
+    if(!thumbs)return;
+    thumbs.style.setProperty('--shot-count',String(photoCount));
+    thumbs.replaceChildren(...Array.from({length:photoCount},(_,index)=>{
+      const captured=Boolean(photos[index]),current=index===currentIndex&&!captured,thumb=document.createElement('div');
+      thumb.className='shot-thumbnail'+(captured?' captured':'')+(current?' is-current':'');
+      thumb.setAttribute('role','listitem');
+      thumb.setAttribute('aria-label',captured?'Photo '+(index+1)+' captured':current?'Photo '+(index+1)+', current':'Photo '+(index+1)+' waiting');
+      if(photos[index]){
+        const image=document.createElement('img');
+        image.src=photos[index];
+        image.alt='Captured photo '+(index+1);
+        thumb.append(image);
+      }else{
+        const number=document.createElement('span');
+        number.textContent=String(index+1).padStart(2,'0');
+        thumb.append(number);
+      }
+      return thumb;
+    }));
+  }
   function requireCanvasContext(canvas:HTMLCanvasElement):CanvasRenderingContext2D{const context=canvas.getContext('2d');if(!context)throw new Error('A 2D canvas context is not available.');return context}
   function capture():string{const canvas=document.createElement('canvas'),width=video.videoWidth||800,height=video.videoHeight||1000;canvas.width=width;canvas.height=height;const context=requireCanvasContext(canvas);if(video.videoWidth){if(facing==='user'){context.translate(width,0);context.scale(-1,1)}context.drawImage(video,0,0,width,height)}else{const background=context.createLinearGradient(0,0,width,height);background.addColorStop(0,'#ead8ce');background.addColorStop(.56,'#f5e6dc');background.addColorStop(1,'#cad8cf');context.fillStyle=background;context.fillRect(0,0,width,height);context.fillStyle='#f3eee5';context.beginPath();context.ellipse(width*.5,height*.85,width*.34,height*.35,0,0,Math.PI*2);context.fill();context.fillStyle='#d5a087';context.beginPath();context.ellipse(width*.5,height*.39,width*.18,height*.2,0,0,Math.PI*2);context.fill();context.fillStyle='#44352f';context.beginPath();context.ellipse(width*.5,height*.3,width*.2,height*.14,Math.PI,0,Math.PI);context.fill();context.fillStyle='#f4f0e7';context.fillRect(width*.42,height*.57,width*.16,height*.16)}return canvas.toDataURL('image/jpeg',.9)}
   function getPrintImage():string{return $<HTMLCanvasElement>('#stripCanvas').toDataURL('image/png')}
@@ -127,12 +251,79 @@ function layoutGeometry():LayoutGeometry{const boxes=[];let w,h;if(selectedLayou
   function drawStickers(ctx:CanvasRenderingContext2D,w:number,h:number):void{if(!stickers.length)return;ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='#30271f35';ctx.shadowBlur=8;stickers.forEach(sticker=>{ctx.font=sticker.size+'px "Apple Color Emoji","Segoe UI Emoji",sans-serif';ctx.fillText(sticker.emoji,sticker.x*w,sticker.y*h)});ctx.restore()}
   function renderStrip():Promise<void>{if(!photos.length)return renderPromise;const version=++renderVersion,canvas=$('#stripCanvas'),ctx=requireCanvasContext(canvas),theme=themeInfo[selectedTheme],geometry=layoutGeometry(),boxes=geometry.boxes,sources=[...photos];canvas.width=geometry.w;canvas.height=geometry.h;canvas.classList.add('is-rendering');renderPromise=Promise.all(sources.map(loadPhoto)).then(images=>{if(version!==renderVersion)return;ctx.clearRect(0,0,geometry.w,geometry.h);drawPaper(ctx,geometry.w,geometry.h,theme);drawFrameHeader(ctx,geometry.w,theme,boxes);if(selectedLayout==='portrait')drawPortraitFrame(ctx);images.forEach((image,index)=>{const box=boxes[index];if(!box)return;const inset=selectedTheme==='midnight'?8:0,x=box.x+inset,y=box.y+inset,w=box.w-inset*2,h=box.h-inset*2;drawPhotoFrame(ctx,box.x,box.y,box.w,box.h,theme);ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();const baseFilter=selectedLayout==='strip'&&selectedTheme==='classic'?'grayscale(1) contrast(1.12) brightness(.94)':selectedTheme==='midnight'?'contrast(1.08) saturate(1.1) brightness(.92)':'none',selectedFilterCss=filterCss[selectedFilter]||'none';ctx.filter=selectedFilterCss==='none'?baseFilter:(baseFilter==='none'?selectedFilterCss:baseFilter+' '+selectedFilterCss);const scale=Math.max(w/image.width,h/image.height),sourceWidth=w/scale,sourceHeight=h/scale;ctx.drawImage(image,(image.width-sourceWidth)/2,(image.height-sourceHeight)/2,sourceWidth,sourceHeight,x,y,w,h);if(selectedLayout==='strip'&&selectedTheme==='classic'){const vignette=ctx.createRadialGradient(x+w*.5,y+h*.48,Math.min(w,h)*.18,x+w*.5,y+h*.5,Math.max(w,h)*.72);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,'rgba(0,0,0,.34)');ctx.fillStyle=vignette;ctx.fillRect(x,y,w,h);for(let grain=0;grain<1100;grain++){const gx=x+(grain*127+index*37)%w,gy=y+(grain*211+index*53)%h;ctx.globalAlpha=grain%3===0?.11:.045;ctx.fillStyle=grain%2?'#fff':'#171612';ctx.fillRect(gx,gy,grain%7===0?2:1,1)}ctx.globalAlpha=1}ctx.restore()});if(selectedTheme==='midnight')drawMidnightDoodles(ctx,geometry.w,boxes);drawCaption(ctx,geometry.w,geometry.h,theme);drawDesign(ctx,boxes,theme);drawStickers(ctx,geometry.w,geometry.h)}).catch(()=>toast('One of the photos could not be added. Please retake the strip.')).finally(()=>{if(version===renderVersion)canvas.classList.remove('is-rendering')});$('#previewTheme').textContent=theme.name;$('#datePreview').textContent=[($('#showDate').checked?capturedAt.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):''),($('#showTime').checked?capturedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):'')].filter(Boolean).join(' · ');return renderPromise}
   ['caption','showDate','showTime'].forEach(id=>$('#'+id).addEventListener('input',renderStrip));$('#showDate').addEventListener('change',renderStrip);$('#showTime').addEventListener('change',renderStrip);$('#captionTextColor').addEventListener('input',()=>{customCaptionColor=true;renderStrip()});$('#dateTimeTextColor').addEventListener('input',()=>{customDateTimeColor=true;renderStrip()});
-    const printTheater=$('#printTheater');$('#printSave').addEventListener('click',()=>$('#saveStrip').click());$('#printShare').addEventListener('click',()=>$('#shareStrip').click());$('#printCustomize').addEventListener('click',()=>{printTheater.classList.remove('open','feeding','printed','print-complete');printTheater.setAttribute('aria-hidden','true');document.body.classList.remove('is-printing');$('#previewModal').classList.add('open')});$('#closePreview').addEventListener('click',()=>$('#previewModal').classList.remove('open'));$('#previewModal').addEventListener('click',e=>{if(e.target===$('#previewModal'))$('#previewModal').classList.remove('open')});
-  $('#retake').addEventListener('click',()=>{$('#previewModal').classList.remove('open');stickers=[];session()});$('#newStrip').addEventListener('click',()=>{$('#previewModal').classList.remove('open');photos=[];stickers=[];$('#progressText').textContent='Ready when you are';$('#progressFill').style.width='0';setStatus('');window.scrollTo({top:0,behavior:'smooth'})});
+    const printTheater=$('#printTheater'),previewModal=$('#previewModal');
+    const printPaper=$('.print-paper',printTheater),printPhoto=$<HTMLImageElement>('#printPhoto'),printTitle=$('.print-title h2',printTheater),printSubtitle=$('.print-title p',printTheater),printStatus=$<HTMLElement>('#printStatus',printTheater);
+    printPhoto.addEventListener('load',()=>{
+      printPhoto.alt=photos.map((_,index)=>`Photo ${index+1} of ${photos.length}`).join(', ');
+      $('#printCaption',printTheater).textContent='SNAPPY BABY · '+capturedAt.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+    });
+    printPaper.addEventListener('animationend',event=>{
+      if(event.animationName!=='paperRelease')return;
+      printTitle.textContent='Your little keepsake is ready.';
+      printSubtitle.textContent='Fresh from the booth, just for you.';
+      printTheater.classList.add('print-complete');
+      printStatus.textContent='Your photo strip is ready';
+      setCurrentStep('done');
+    });
+  const stepperObserver=new MutationObserver(()=>{
+    if(previewModal.classList.contains('open')){
+      const previewCard=$('.preview-card',previewModal);
+      previewCard.insertBefore(stepper,previewCard.firstChild);
+      return;
+    }
+    if(printTheater.classList.contains('open')){
+      const theaterInner=$('.print-theater-inner',printTheater);
+      theaterInner.insertBefore(stepper,theaterInner.firstChild);
+      if(printTheater.classList.contains('print-complete'))setCurrentStep('done');
+      return;
+    }
+    placeStepperInBooth();
+  });
+  stepperObserver.observe(printTheater,{attributes:true,attributeFilter:['class']});
+  stepperObserver.observe(previewModal,{attributes:true,attributeFilter:['class']});
+  shutter.removeEventListener('click',session);
+  shutter.addEventListener('click',()=>{
+    if(busy)return;
+    setCurrentStep('shoot');
+    const sessionTask=session();
+    renderStepper();
+    void sessionTask.finally(renderStepper);
+  });
+  $('#printSave').addEventListener('click',()=>{if(printTheater.classList.contains('print-complete'))$('#saveStrip').click()});
+  $('#printShare').addEventListener('click',()=>{if(printTheater.classList.contains('print-complete'))$('#shareStrip').click()});
+  $('#printCustomize').addEventListener('click',()=>{
+    if(!printTheater.classList.contains('print-complete'))return;
+    printTheater.classList.remove('open','feeding','printed','released','print-complete');
+    printTheater.setAttribute('aria-hidden','true');
+    document.body.classList.remove('is-printing');
+    previewModal.classList.add('open');
+  });
+  $('#closePreview').addEventListener('click',()=>previewModal.classList.remove('open'));
+  previewModal.addEventListener('click',e=>{if(e.target===previewModal)previewModal.classList.remove('open')});
+  $('#retake').addEventListener('click',()=>{previewModal.classList.remove('open');stickers=[];setCurrentStep('shoot');const sessionTask=session();renderStepper();void sessionTask.finally(renderStepper)});
+  function startNewStrip():void{
+    printTheater.classList.remove('open','processing','feeding','printed','released','print-complete');
+    printTheater.setAttribute('aria-hidden','true');
+    previewModal.classList.remove('open');
+    document.body.classList.remove('is-printing');
+    photos=[];stickers=[];
+    setCurrentStep('setup');
+    updateProgress(0);
+    $('#progressText').textContent='Ready when you are';
+    $('#progressFill').style.width='0';
+    setStatus('');
+    window.scrollTo({top:0,behavior:'smooth'});
+    shutter.focus({preventScroll:true});
+  }
+  $('#newStrip').addEventListener('click',startNewStrip);
+  $('#printTakeAnother').addEventListener('click',()=>{
+    if(!printTheater.classList.contains('print-complete'))return;
+    if(window.confirm('Start another session? This will discard your current photo strip.'))startNewStrip();
+  });
   function confetti(){const box=$('#confetti');box.innerHTML='';const colors=['#f1b8b1','#e8cf9e','#b6cbb8','#d7b9d0','#f2dcaa'];for(let i=0;i<70;i++){const el=document.createElement('i');el.style.left=Math.random()*100+'%';el.style.background=colors[i%colors.length];el.style.animationDelay=Math.random()*.75+'s';el.style.animationDuration=(1.6+Math.random()*1.4)+'s';el.style.transform=`rotate(${Math.random()*360}deg)`;box.appendChild(el)}setTimeout(()=>box.innerHTML='',3400)}
   async function canvasBlob():Promise<Blob|null>{await renderPromise;return canvasToBlob($('#stripCanvas'))}
-  $('#saveStrip').addEventListener('click',async()=>{const name=`snappy-baby-${Date.now()}.png`;let pickerTask:Promise<SavePickerResult>|null=null;if(window.showSaveFilePicker){try{pickerTask=window.showSaveFilePicker({suggestedName:name,types:[{description:'PNG photo strip',accept:{'image/png':['.png']}}]}).then((handle):SavePickerResult=>({handle}),(error:unknown):SavePickerResult=>({error}))}catch(e){}}const blob=await canvasBlob();if(!blob)return;if(pickerTask){const result=await pickerTask;if('handle' in result){try{const writable=await result.handle.createWritable();await writable.write(blob);await writable.close();confetti();toast('Photo strip saved to your computer ✨');return}catch(e){toast('Could not write the file. Downloading it instead.')}}else if(errorName(result.error)==='AbortError')return}downloadStrip(blob,name);confetti();toast('Photo strip downloaded ✨')});
-  $('#shareStrip').addEventListener('click',async()=>{const blob=await canvasBlob();if(!blob)return;const file=new File([blob],`snappy-baby-${Date.now()}.png`,{type:'image/png'});try{if(navigator.canShare?.({files:[file]}))await navigator.share({files:[file],title:'My Snappy Baby strip',text:'A little moment, made mine.'});else if(navigator.share)await navigator.share({title:'My Snappy Baby strip',text:'Made with Snappy Baby ✨'});else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=file.name;a.click();toast('Image downloaded — it is ready to share')}}catch(error){if(errorName(error)!=='AbortError')toast('Sharing is unavailable in this browser')}});
+  $('#saveStrip').addEventListener('click',async()=>{const name=`snappy-baby-${Date.now()}.png`;let pickerTask:Promise<SavePickerResult>|null=null;if(window.showSaveFilePicker){try{pickerTask=window.showSaveFilePicker({suggestedName:name,types:[{description:'PNG photo strip',accept:{'image/png':['.png']}}]}).then((handle):SavePickerResult=>({handle}),(error:unknown):SavePickerResult=>({error}))}catch(e){}}const blob=await canvasBlob();if(!blob)return;if(pickerTask){const result=await pickerTask;if('handle' in result){try{const writable=await result.handle.createWritable();await writable.write(blob);await writable.close();confetti();toast('Photo strip saved to your computer ✨');setCurrentStep('done');return}catch(e){toast('Could not write the file. Downloading it instead.')}}else if(errorName(result.error)==='AbortError')return}downloadStrip(blob,name);confetti();toast('Photo strip downloaded ✨');setCurrentStep('done')});
+  $('#shareStrip').addEventListener('click',async()=>{const blob=await canvasBlob();if(!blob)return;const file=new File([blob],`snappy-baby-${Date.now()}.png`,{type:'image/png'});try{if(navigator.canShare?.({files:[file]}))await navigator.share({files:[file],title:'My Snappy Baby strip',text:'A little moment, made mine.'});else if(navigator.share)await navigator.share({title:'My Snappy Baby strip',text:'Made with Snappy Baby ✨'});else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=file.name;a.click();toast('Image downloaded — it is ready to share')}setCurrentStep('done')}catch(error){if(errorName(error)!=='AbortError')toast('Sharing is unavailable in this browser')}});
   $('#themeMode').addEventListener('click',()=>{const dark=document.documentElement.dataset.mode!=='dark';document.documentElement.dataset.mode=dark?'dark':'light';$('#modeIcon').innerHTML=dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>':'<path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/>'});
   const faqModal=$<HTMLDivElement>('#faqModal'),faqButton=$<HTMLButtonElement>('#faqButton'),welcomeFaqLink=$<HTMLAnchorElement>('#welcomeFaqLink');
   let faqReturnFocus:HTMLElement=faqButton;

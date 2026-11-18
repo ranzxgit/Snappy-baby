@@ -58,6 +58,41 @@
         <button class="icon-btn" id="settingsFocus" aria-label="Focus session settings" title="Session settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1a1.7 1.7 0 0 1-2.4 2.4l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a1.7 1.7 0 0 1-3.4 0v-.2a1.7 1.7 0 0 0-2.9-1.2l-.1.1a1.7 1.7 0 0 1-2.4-2.4l.1-.1A1.7 1.7 0 0 0 4.2 12H4a1.7 1.7 0 0 1 0-3.4h.2a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a1.7 1.7 0 0 1 2.4-2.4l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a1.7 1.7 0 0 1 3.4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a1.7 1.7 0 0 1 2.4 2.4l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a1.7 1.7 0 0 1 0 3.4h-.2a1.7 1.7 0 0 0-1.2 2.9Z"/></svg></button>
       </div>
     </header>
+    <nav class="booth-stepper" id="boothStepper" aria-label="Photobooth progress">
+      <ol class="stepper-list">
+        <li class="stepper-step is-current" data-step="setup" aria-current="step">
+          <button class="stepper-button" type="button" disabled>
+            <span class="stepper-marker" aria-hidden="true"><svg class="stepper-check" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8"/></svg></span>
+            <span class="stepper-label">Setup</span>
+            <span class="stepper-visually-hidden">Step 1 of 4: Setup, current</span>
+          </button>
+          <span class="stepper-connector" aria-hidden="true"><span></span></span>
+        </li>
+        <li class="stepper-step is-upcoming" data-step="shoot">
+          <button class="stepper-button" type="button" disabled>
+            <span class="stepper-marker" aria-hidden="true"><svg class="stepper-check" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8"/></svg></span>
+            <span class="stepper-label">Shoot</span>
+            <span class="stepper-visually-hidden">Step 2 of 4: Shoot, upcoming</span>
+          </button>
+          <span class="stepper-connector" aria-hidden="true"><span></span></span>
+        </li>
+        <li class="stepper-step is-upcoming" data-step="customize">
+          <button class="stepper-button" type="button" disabled>
+            <span class="stepper-marker" aria-hidden="true"><svg class="stepper-check" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8"/></svg></span>
+            <span class="stepper-label">Customize</span>
+            <span class="stepper-visually-hidden">Step 3 of 4: Customize, upcoming</span>
+          </button>
+          <span class="stepper-connector" aria-hidden="true"><span></span></span>
+        </li>
+        <li class="stepper-step is-upcoming" data-step="done">
+          <button class="stepper-button" type="button" disabled>
+            <span class="stepper-marker" aria-hidden="true"><svg class="stepper-check" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8"/></svg></span>
+            <span class="stepper-label">Done</span>
+            <span class="stepper-visually-hidden">Step 4 of 4: Done, upcoming</span>
+          </button>
+        </li>
+      </ol>
+    </nav>
     <main class="main" id="cameraScreen">
       <section class="left-column">
         <div class="intro"><p class="eyebrow">A little moment, made yours</p><h1>Good things<br/>come in fours.</h1><p>Get comfy, find your light, and make a tiny keepsake worth keeping.</p></div>
@@ -99,7 +134,34 @@
     <footer class="footer"><span class="footer-brand">SEOUL-STYLE SELF PHOTO STUDIO</span><span>Snappy Baby Studio · 01</span></footer>
   </div>
   <div class="modal-wrap" id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewTitle"><div class="preview-card"><div class="preview-header"><div><h2 id="previewTitle">Your little keepsake</h2><p>Take a peek. Make it yours.</p></div><button class="icon-btn" id="closePreview" aria-label="Close preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="preview-content"><div class="strip-stage"><canvas id="stripCanvas" class="strip-canvas" aria-label="Photo strip preview"></canvas></div><div class="preview-options"><div><div class="option-label">CURRENT TEMPLATE</div><div class="preview-theme-name" id="previewTheme">Classic</div><div class="frame-picker" id="previewThemeChoices"></div></div><div><div class="option-label">A NOTE ON YOUR STRIP</div><input class="custom-input" id="previewCaption" maxlength="30" placeholder="Write a little something…" aria-label="Preview strip text"/></div><div class="date-line"><label class="toggle"><input type="checkbox" id="previewDate" checked/> Date</label><label class="toggle"><input type="checkbox" id="previewTime"/> Time</label><span style="flex:1"></span><span class="option-label" id="datePreview"></span></div><div class="preview-actions"><button class="primary-btn" id="saveStrip">↓ &nbsp; Download photo strip</button><button class="secondary-btn" id="shareStrip">↗ &nbsp; Share your strip</button><button class="secondary-btn" id="retake">↺ &nbsp; Retake photos</button><button class="secondary-btn" id="newStrip">＋ &nbsp; Create a new strip</button></div><p class="tiny-note">A little memory, ready to go wherever you do.</p></div></div></div></div>
-  <div class="print-theater" id="printTheater" aria-hidden="true"><div class="print-theater-inner"><div class="print-title"><span class="print-kicker">A LITTLE MOMENT, MADE YOURS</span><h2>Making your keepsake</h2><p>Your photos are on their way.</p><span class="print-processing"><i></i>Preparing your photos</span></div><div class="printer-scene"><div class="printer-body"><div class="printer-top"><span class="printer-brand">SNAPPY BABY</span><span class="printer-light"></span></div><div class="printer-face"><span class="printer-lens"></span><span class="printer-status">PHOTO STUDIO · 01</span></div><div class="printer-slot"><span></span></div></div><div class="print-feed-window"><div class="print-paper"><img id="printPhoto" alt="Your finished photobooth collage" /></div></div></div><div class="print-actions" id="printActions"><p>Save a copy or share this little memory.</p><div class="print-action-row"><button class="primary-btn" id="printSave">Save Photo</button><button class="secondary-btn" id="printShare">Share Photo</button></div><button class="print-customize" id="printCustomize">Personalize your print</button></div></div></div><div class="confetti" id="confetti"></div><div class="toast" id="toast" role="status"></div>
+  <div class="print-theater" id="printTheater" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="printTitle">
+    <div class="print-theater-inner">
+      <div class="print-title">
+        <h2 id="printTitle">Your little keepsake is ready.</h2>
+        <p>Fresh from the booth, just for you.</p>
+      </div>
+      <div class="printer-scene">
+        <div class="print-feed-window"><div class="print-paper"><img id="printPhoto" alt="" /><span class="print-caption" id="printCaption"></span></div></div>
+        <div class="printer-body" aria-hidden="true">
+          <div class="printer-top"><span class="printer-brand">SNAPPY BABY</span><span class="printer-light"></span></div>
+          <div class="printer-face"><span class="printer-lens"></span><span class="printer-status">PHOTO STUDIO · 01</span></div>
+          <div class="printer-slot"><span></span></div>
+        </div>
+      </div>
+      <div class="print-actions" id="printActions">
+        <div class="print-action-row">
+          <button class="primary-btn" id="printSave" type="button" aria-label="Save photo strip">Save Photo</button>
+          <button class="secondary-btn" id="printShare" type="button" aria-label="Share photo strip">Share Photo</button>
+        </div>
+        <div class="print-links">
+          <button class="print-customize" id="printCustomize" type="button" aria-label="Personalize your print">Personalize your print</button>
+          <button class="print-take-another" id="printTakeAnother" type="button" aria-label="Take another set of photos">Take another</button>
+        </div>
+      </div>
+      <p class="print-status stepper-visually-hidden" id="printStatus" aria-live="polite" aria-atomic="true"></p>
+    </div>
+  </div>
+  <div class="confetti" id="confetti"></div><div class="toast" id="toast" role="status"></div>
   <div class="modal-wrap faq-modal" id="faqModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="faqTitle">
     <section class="faq-card">
       <header class="preview-header">
