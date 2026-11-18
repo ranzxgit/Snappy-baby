@@ -854,3 +854,15 @@ body.is-printing{overflow:hidden}
   .print-paper,.print-theater.released .print-paper{clip-path:none!important;transform:rotate(-2deg)!important;animation:none!important;transition:none!important}
   .print-theater .print-actions{transition:none}
 }
+
+.privacy-dialog{width:min(92vw,680px);max-width:none;max-height:85vh;max-height:85dvh;overflow:hidden;padding:0;border:1px solid #e3d8c9;border-radius:24px;background:#fffefa;color:#292a2b;box-shadow:0 24px 70px #17161230}
+.privacy-dialog::backdrop{background:#19191888;backdrop-filter:blur(8px)}
+.privacy-card{display:flex;max-height:85vh;max-height:85dvh;flex-direction:column;padding:clamp(22px,4vw,32px)}
+.privacy-header{display:flex;flex:0 0 auto;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.privacy-header .faq-kicker{margin:0 0 7px;color:#6b5945;font-size:9px;font-weight:700;letter-spacing:.16em}
+.privacy-header h2{margin:0;color:#292a2b;font:500 clamp(23px,4vw,31px)/1.15 var(--display,'Playfair Display',Georgia,serif);letter-spacing:-.04em}
+.privacy-header .icon-btn{width:44px;height:44px;flex:0 0 44px}
+.privacy-content{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:6px;margin-right:-6px}
+.privacy-content h3{margin:19px 0 7px;color:#292a2b;font-size:15px;font-weight:600}
+.privacy-content p{margin:0 0 12px;color:#575149;font-size:14px;line-height:1.65}
+@media(max-width:480px){.privacy-dialog{width:calc(100% - 24px);max-height:88vh;max-height:88dvh;border-radius:22px}.privacy-card{max-height:88vh;max-height:88dvh;padding:22px}}

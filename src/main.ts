@@ -389,6 +389,29 @@ function layoutGeometry():LayoutGeometry{const boxes=[];let w,h;if(selectedLayou
     if(event.shiftKey&&(active===first||!faqModal.contains(active))){event.preventDefault();last.focus()}
     else if(!event.shiftKey&&(active===last||!faqModal.contains(active))){event.preventDefault();first.focus()}
   });
+  const privacyDialog=$<HTMLDialogElement>('#privacyPolicyDialog'),privacyLink=$<HTMLAnchorElement>('#welcomePrivacyLink');
+  let privacyPreviousOverflow:{body:string;document:string}|null=null;
+  privacyLink.addEventListener('click',event=>{
+    event.preventDefault();
+    privacyPreviousOverflow={body:document.body.style.overflow,document:document.documentElement.style.overflow};
+    document.body.style.overflow='hidden';
+    document.documentElement.style.overflow='hidden';
+    privacyDialog.showModal();
+  });
+  $('#closePrivacyPolicy').addEventListener('click',()=>privacyDialog.close());
+  privacyDialog.addEventListener('click',event=>{if(event.target===privacyDialog)privacyDialog.close()});
+  privacyDialog.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){
+      event.preventDefault();
+      privacyDialog.close();
+    }
+  });
+  privacyDialog.addEventListener('close',()=>{
+    if(!privacyPreviousOverflow)return;
+    document.body.style.overflow=privacyPreviousOverflow.body;
+    document.documentElement.style.overflow=privacyPreviousOverflow.document;
+    privacyPreviousOverflow=null;
+  });
     const fullFlash=$('#welcomeFullFlash'),lensButton=$('#welcomeLens');lensButton.addEventListener('click',()=>{playShutterSound();fullFlash.classList.remove('is-flashing');void fullFlash.offsetWidth;fullFlash.classList.add('is-flashing')});fullFlash.addEventListener('animationend',()=>fullFlash.classList.remove('is-flashing'));
     const cursorHalo=$('#cursorHalo'),hoverPointer=window.matchMedia('(hover: hover) and (pointer: fine)');let cursorTargetX=0,cursorTargetY=0,cursorCurrentX:number|null=null,cursorCurrentY:number|null=null,cursorFrame=0,cursorFrameTime=0;const moveCursorHalo:FrameRequestCallback=timestamp=>{cursorFrame=0;if(!hoverPointer.matches||!cursorHalo.classList.contains('visible'))return;const elapsed=cursorFrameTime?Math.min(48,timestamp-cursorFrameTime):16;cursorFrameTime=timestamp;if(cursorCurrentX===null||cursorCurrentY===null){cursorCurrentX=cursorTargetX;cursorCurrentY=cursorTargetY}else{const ease=1-Math.exp(-elapsed/95);cursorCurrentX+=(cursorTargetX-cursorCurrentX)*ease;cursorCurrentY+=(cursorTargetY-cursorCurrentY)*ease}cursorHalo.style.setProperty('--cursor-x',cursorCurrentX+'px');cursorHalo.style.setProperty('--cursor-y',cursorCurrentY+'px');if(Math.abs(cursorTargetX-cursorCurrentX)>.15||Math.abs(cursorTargetY-cursorCurrentY)>.15)cursorFrame=requestAnimationFrame(moveCursorHalo);else cursorFrameTime=0};window.addEventListener('pointermove',event=>{if(event.pointerType!=='mouse'||!hoverPointer.matches||$('#welcomeScreen').classList.contains('hidden'))return;cursorTargetX=event.clientX;cursorTargetY=event.clientY;if(cursorCurrentX===null||cursorCurrentY===null){cursorCurrentX=cursorTargetX;cursorCurrentY=cursorTargetY}cursorHalo.classList.add('visible');if(!cursorFrame)cursorFrame=requestAnimationFrame(moveCursorHalo)},{passive:true});const hideCursorHalo=()=>{cursorHalo.classList.remove('visible');cursorCurrentX=null;cursorFrameTime=0};window.addEventListener('pointerleave',hideCursorHalo);window.addEventListener('blur',hideCursorHalo);hoverPointer.addEventListener?.('change',event=>{if(!event.matches)hideCursorHalo()});
     const loadingScreen=$('#loadingScreen'),loadingContent=$('#loadingContent'),loadingStatus=$('#loadingStatus'),loadingError=$('#loadingError'),loadingErrorText=$('#loadingErrorText'),loadingMessages=['Setting up your booth...','Warming up the camera...','Almost ready...'],BOOTH_LOADING_MIN_MS=1200,BOOTH_LOADING_MAX_MS=8000;let loadingMessageTimer:ReturnType<typeof setInterval>|null=null;

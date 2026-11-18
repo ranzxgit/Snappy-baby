@@ -18,7 +18,7 @@
     <span class="welcome-full-flash" id="welcomeFullFlash" aria-hidden="true"></span>
     <header class="welcome-header">
       <a class="welcome-brand" href="#welcomeTitle" aria-label="Snappy Baby home"><span class="welcome-brand-name"><span class="ios-reveal" style="--i:0">Snappy Baby</span></span></a>
-      <nav class="welcome-nav" aria-label="Main navigation"><a href="#welcomeTitle"><span class="ios-reveal" style="--i:1">About</span></a><a href="#welcomeGallery"><span class="ios-reveal" style="--i:2">Gallery</span></a><a href="#beginBooth"><span class="ios-reveal" style="--i:3">Contact</span></a><a href="#faqModal" id="welcomeFaqLink" aria-haspopup="dialog"><span class="ios-reveal" style="--i:4">FAQ</span></a></nav>
+      <nav class="welcome-nav" aria-label="Main navigation"><a href="#welcomeTitle"><span class="ios-reveal" style="--i:1">About</span></a><a href="#welcomeGallery"><span class="ios-reveal" style="--i:2">Gallery</span></a><a href="#beginBooth"><span class="ios-reveal" style="--i:3">Contact</span></a><a href="#faqModal" id="welcomeFaqLink" aria-haspopup="dialog"><span class="ios-reveal" style="--i:4">FAQ</span></a><a href="#privacyPolicyDialog" id="welcomePrivacyLink" aria-haspopup="dialog"><span class="ios-reveal" style="--i:5">Privacy</span></a></nav>
     </header>
     <section class="welcome-content">
       <div class="welcome-copy">
@@ -208,6 +208,26 @@
       </div>
     </section>
   </div>
+  <dialog class="privacy-dialog" id="privacyPolicyDialog" aria-labelledby="privacyPolicyTitle">
+    <div class="privacy-card">
+      <header class="privacy-header">
+        <div><p class="faq-kicker">YOUR PRIVACY</p><h2 id="privacyPolicyTitle">Privacy Policy</h2></div>
+        <button class="icon-btn" id="closePrivacyPolicy" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      </header>
+      <div class="privacy-content">
+        <p>Snappy Baby is a free, browser-based photobooth. This policy explains what information is handled when you visit and use the site.</p>
+        <h3>Photos and camera access</h3>
+        <p>When you choose to use the photobooth and grant camera permission, your photos are processed in your browser and held in memory while you create your strip. Snappy Baby does not upload your photos to its own server or store them in a photo database.</p>
+        <p>If you download your strip, your browser saves a copy to your device. If you use Share Photo, your browser or device may pass the image to the app or destination you select; that service's privacy practices then apply.</p>
+        <h3>Personal information and analytics</h3>
+        <p>Snappy Baby does not ask you to create an account or provide your name, email address, or other personal details. The current website code does not include an analytics service or set tracking cookies.</p>
+        <h3>Browser and hosting services</h3>
+        <p>Your browser handles camera permission and any download or sharing you request. The provider hosting this website may process basic technical request information to deliver and protect the site; check that provider's policy for details.</p>
+        <h3>Your choices and security</h3>
+        <p>You can decline or revoke camera permission in your browser settings, and you decide whether to download or share a strip. Photos stay in your browser unless you choose an action that saves or shares them. When you visit the hosted site over HTTPS, the connection to the site is encrypted.</p>
+      </div>
+    </div>
+  </dialog>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
