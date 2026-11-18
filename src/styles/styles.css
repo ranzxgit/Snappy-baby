@@ -600,15 +600,51 @@ body.is-printing .app-shell{filter:blur(8px);opacity:.42;transform:scale(.985);t
 
 .faq-button{width:auto;min-width:40px;padding:0 12px;border-radius:999px;color:var(--ink,#292a2b);font-size:11px;font-weight:700}
 .faq-modal{z-index:30}
-.faq-card{width:min(100%,560px);max-height:90vh;overflow-y:auto;padding:28px;border:1px solid var(--line,#eae8e0);border-radius:24px;background:var(--card,#fffefa);color:var(--ink,#292a2b);box-shadow:0 24px 70px #17161230}
-.faq-card .preview-header{margin-bottom:20px}
+.faq-modal.open{display:grid;animation:faqBackdropIn .35s cubic-bezier(.32,.72,0,1) both}
+.faq-modal.open.is-closing{animation:faqBackdropOut .2s ease-in both}
+.faq-card{display:flex;width:min(92vw,560px);max-height:85vh;max-height:85dvh;flex-direction:column;overflow:hidden;padding:32px;border:1px solid #e3d8c9;border-radius:24px;background:#fffefa;color:#292a2b;box-shadow:0 24px 70px #17161230}
+.faq-modal.open .faq-card{animation:faqCardIn .35s cubic-bezier(.32,.72,0,1) both}
+.faq-modal.open.is-closing .faq-card{animation:faqCardOut .2s ease-in both}
+.faq-card .preview-header{flex:0 0 auto;align-items:flex-start;margin-bottom:20px}
 .faq-card .preview-header h2{margin:0;font:500 clamp(23px,4vw,31px)/1.15 var(--display,'Playfair Display',Georgia,serif);letter-spacing:-.04em}
-.faq-kicker{margin:0 0 7px;color:#a18c73;font-size:9px;font-weight:700;letter-spacing:.16em}
-.faq-item{overflow:hidden;border:1px solid var(--line,#eae8e0);border-radius:15px;background:var(--paper,#f7f5f0)}
-.faq-item summary{position:relative;padding:17px 45px 17px 18px;font-size:13px;font-weight:600;cursor:pointer;list-style:none}
-.faq-item summary::-webkit-details-marker{display:none}
-.faq-item summary::after{position:absolute;top:50%;right:18px;color:#9b806c;font-size:18px;font-weight:400;content:"+";transform:translateY(-50%)}
-.faq-item[open] summary::after{content:"−"}
-.faq-item summary:focus-visible{outline:3px solid #c9ad90;outline-offset:-4px}
-.faq-item p{margin:0;padding:0 18px 19px;color:var(--muted,#898985);font-size:12px;line-height:1.75}
-@media(max-width:430px){.faq-card{padding:20px;border-radius:20px}.faq-card .preview-header{margin-bottom:16px}.faq-card .preview-header h2{font-size:23px}.faq-item summary{padding:15px 40px 15px 15px;font-size:12px}.faq-item summary::after{right:15px}.faq-item p{padding:0 15px 16px;font-size:11px}}
+.faq-card .icon-btn{width:44px;height:44px;flex:0 0 44px}
+.faq-card .faq-kicker{margin:0 0 7px;color:#6b5945;font-size:9px;font-weight:700;letter-spacing:.16em}
+.faq-list{display:flex;flex:1 1 auto;min-height:0;flex-direction:column;gap:10px;overflow-y:auto;overscroll-behavior:contain;padding:2px 6px 6px 1px;margin:0 -6px;scrollbar-color:#b9a993 transparent;scrollbar-width:thin}
+.faq-item{flex:0 0 auto;overflow:hidden;border:1px solid #d8cdbd;border-radius:15px;background:#f7f1e8;box-shadow:0 2px 8px #3a30200a;transition:transform .2s ease,border-color .2s ease,background-color .2s ease,box-shadow .2s ease}
+.faq-item:hover{transform:translateY(-1px);background:#f3eadc;box-shadow:0 5px 13px #3a302012}
+.faq-item:active{transform:scale(.99)}
+.faq-item.is-open{border-color:#bfae97;background:#fffefa;box-shadow:0 4px 14px #3a302012}
+.faq-item h3{margin:0}
+.faq-question{display:flex;width:100%;min-height:56px;align-items:center;justify-content:space-between;gap:16px;padding:13px 17px;border:0;border-radius:14px;background:transparent;color:#292a2b;font:500 16px/1.4 var(--body,'DM Sans',Arial,sans-serif);text-align:left;cursor:pointer}
+.faq-question:focus-visible,.faq-card .icon-btn:focus-visible{outline:3px solid #8a6e4f;outline-offset:2px}
+.faq-icon{position:relative;display:block;width:20px;height:20px;flex:0 0 20px;color:#604c35;transform:rotate(0);transition:transform .2s ease}
+.faq-icon::before,.faq-icon::after{position:absolute;top:9px;left:4px;width:12px;height:2px;border-radius:2px;background:currentColor;content:""}
+.faq-icon::after{transform:rotate(90deg)}
+.faq-item.is-open .faq-icon{transform:rotate(45deg)}
+.faq-answer{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .3s cubic-bezier(.32,.72,0,1),opacity .3s cubic-bezier(.32,.72,0,1)}
+.faq-item.is-open .faq-answer{grid-template-rows:1fr;opacity:1}
+.faq-answer-inner{min-height:0;overflow:hidden}
+.faq-answer p{margin:0;padding:0 17px 18px;color:#575149;font-size:14px;line-height:1.65}
+.faq-modal.open:not(.is-closing) .faq-item{animation:faqRowIn .28s cubic-bezier(.32,.72,0,1) both}
+.faq-modal.open:not(.is-closing) .faq-item:nth-child(1){animation-delay:40ms}
+.faq-modal.open:not(.is-closing) .faq-item:nth-child(2){animation-delay:80ms}
+.faq-modal.open:not(.is-closing) .faq-item:nth-child(3){animation-delay:120ms}
+.faq-modal.open:not(.is-closing) .faq-item:nth-child(4){animation-delay:160ms}
+.faq-modal.open:not(.is-closing) .faq-item:nth-child(5){animation-delay:200ms}
+.faq-modal.open:not(.is-closing) .faq-item:nth-child(6){animation-delay:240ms}
+.faq-modal.open:not(.is-closing) .faq-item:nth-child(7){animation-delay:280ms}
+.faq-modal.open:not(.is-closing) .faq-item:nth-child(8){animation-delay:320ms}
+@keyframes faqBackdropIn{from{opacity:0}to{opacity:1}}
+@keyframes faqBackdropOut{from{opacity:1}to{opacity:0}}
+@keyframes faqCardIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes faqCardOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.96)}}
+@keyframes faqRowIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:479px){.faq-modal{align-items:end;padding:0}.faq-card{width:min(92vw,560px);max-height:85vh;max-height:85dvh;padding:24px 20px max(24px,env(safe-area-inset-bottom));border-radius:24px 24px 0 0}.faq-modal.open .faq-card{animation-name:faqSheetIn}.faq-modal.open.is-closing .faq-card{animation-name:faqSheetOut}.faq-card .preview-header{margin-bottom:16px}.faq-card .preview-header h2{font-size:23px}.faq-question{min-height:56px;padding:13px 12px;font-size:16px}.faq-answer p{padding:0 12px 16px;font-size:14px}}
+@keyframes faqSheetIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes faqSheetOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(20px)}}
+@media(prefers-reduced-motion:reduce){.faq-modal.open{animation:faqBackdropFadeIn .12s ease both}.faq-modal.open.is-closing{animation:faqBackdropFadeOut .12s ease both}.faq-modal.open .faq-card{animation:faqCardFadeIn .12s ease both}.faq-modal.open.is-closing .faq-card{animation:faqCardFadeOut .12s ease both}.faq-modal.open:not(.is-closing) .faq-item{animation:faqRowFadeIn .12s ease both}.faq-item,.faq-answer,.faq-icon{transition:opacity .12s ease}.faq-item:hover,.faq-item:active{transform:none}}
+@keyframes faqBackdropFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes faqBackdropFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes faqCardFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes faqCardFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes faqRowFadeIn{from{opacity:0}to{opacity:1}}

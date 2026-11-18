@@ -136,13 +136,68 @@ function layoutGeometry():LayoutGeometry{const boxes=[];let w,h;if(selectedLayou
   $('#themeMode').addEventListener('click',()=>{const dark=document.documentElement.dataset.mode!=='dark';document.documentElement.dataset.mode=dark?'dark':'light';$('#modeIcon').innerHTML=dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>':'<path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/>'});
   const faqModal=$<HTMLDivElement>('#faqModal'),faqButton=$<HTMLButtonElement>('#faqButton'),welcomeFaqLink=$<HTMLAnchorElement>('#welcomeFaqLink');
   let faqReturnFocus:HTMLElement=faqButton;
-  function openFaq(trigger:HTMLElement):void{faqReturnFocus=trigger;faqModal.classList.add('open');faqModal.setAttribute('aria-hidden','false');$('#closeFaq').focus()}
-  function closeFaq():void{faqModal.classList.remove('open');faqModal.setAttribute('aria-hidden','true');faqReturnFocus.focus()}
+  let faqPreviousOverflow:{body:string;document:string}|null=null;
+  const faqQuestions=$$<HTMLButtonElement>('.faq-question',faqModal);
+  faqQuestions.forEach(question=>question.addEventListener('click',()=>{
+    const shouldOpen=question.getAttribute('aria-expanded')!=='true';
+    faqQuestions.forEach(itemButton=>{
+      const expanded=itemButton===question&&shouldOpen;
+      itemButton.setAttribute('aria-expanded',String(expanded));
+      const answerId=itemButton.getAttribute('aria-controls');
+      const answer=answerId?faqModal.querySelector<HTMLElement>('#'+answerId):null;
+      const item=itemButton.closest<HTMLElement>('.faq-item');
+      if(!answerId||!answer||!item)throw new Error('FAQ question is missing its answer panel.');
+      answer.setAttribute('aria-hidden',String(!expanded));
+      item.classList.toggle('is-open',expanded);
+    });
+  }));
+  function openFaq(trigger:HTMLElement):void{
+    if(!faqModal.classList.contains('open')){
+      faqPreviousOverflow={body:document.body.style.overflow,document:document.documentElement.style.overflow};
+      document.body.style.overflow='hidden';
+      document.documentElement.style.overflow='hidden';
+    }
+    faqReturnFocus=trigger;
+    faqModal.classList.remove('is-closing');
+    faqModal.classList.add('open');
+    faqModal.setAttribute('aria-hidden','false');
+    $('#closeFaq').focus();
+  }
+  function finishFaqClose():void{
+    if(!faqModal.classList.contains('is-closing'))return;
+    faqModal.classList.remove('open','is-closing');
+    faqModal.setAttribute('aria-hidden','true');
+    if(faqPreviousOverflow){
+      document.body.style.overflow=faqPreviousOverflow.body;
+      document.documentElement.style.overflow=faqPreviousOverflow.document;
+      faqPreviousOverflow=null;
+    }
+    faqReturnFocus.focus();
+  }
+  function closeFaq():void{
+    if(!faqModal.classList.contains('open')||faqModal.classList.contains('is-closing'))return;
+    // Keep the modal mounted until its CSS exit animation finishes.
+    faqModal.classList.add('is-closing');
+  }
   faqButton.addEventListener('click',()=>openFaq(faqButton));
   welcomeFaqLink.addEventListener('click',event=>{event.preventDefault();openFaq(welcomeFaqLink)});
   $('#closeFaq').addEventListener('click',closeFaq);
   faqModal.addEventListener('click',event=>{if(event.target===faqModal)closeFaq()});
-  document.addEventListener('keydown',event=>{if(event.key==='Escape'){if(faqModal.classList.contains('open'))closeFaq();else $('#previewModal').classList.remove('open')}});
+  faqModal.addEventListener('animationend',event=>{if(event.target===faqModal)finishFaqClose()});
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){
+      if(faqModal.classList.contains('open'))closeFaq();
+      else $('#previewModal').classList.remove('open');
+      return;
+    }
+    if(event.key!=='Tab'||!faqModal.classList.contains('open')||faqModal.classList.contains('is-closing'))return;
+    // Keep keyboard focus within the dialog while it is open.
+    const focusable=Array.from(faqModal.querySelectorAll<HTMLButtonElement>('button:not([disabled])'));
+    const first=focusable[0],last=focusable[focusable.length-1],active=document.activeElement;
+    if(!first||!last)return;
+    if(event.shiftKey&&(active===first||!faqModal.contains(active))){event.preventDefault();last.focus()}
+    else if(!event.shiftKey&&(active===last||!faqModal.contains(active))){event.preventDefault();first.focus()}
+  });
     const fullFlash=$('#welcomeFullFlash'),lensButton=$('#welcomeLens');lensButton.addEventListener('click',()=>{playShutterSound();fullFlash.classList.remove('is-flashing');void fullFlash.offsetWidth;fullFlash.classList.add('is-flashing')});fullFlash.addEventListener('animationend',()=>fullFlash.classList.remove('is-flashing'));
     const cursorHalo=$('#cursorHalo'),hoverPointer=window.matchMedia('(hover: hover) and (pointer: fine)');let cursorTargetX=0,cursorTargetY=0,cursorCurrentX:number|null=null,cursorCurrentY:number|null=null,cursorFrame=0,cursorFrameTime=0;const moveCursorHalo:FrameRequestCallback=timestamp=>{cursorFrame=0;if(!hoverPointer.matches||!cursorHalo.classList.contains('visible'))return;const elapsed=cursorFrameTime?Math.min(48,timestamp-cursorFrameTime):16;cursorFrameTime=timestamp;if(cursorCurrentX===null||cursorCurrentY===null){cursorCurrentX=cursorTargetX;cursorCurrentY=cursorTargetY}else{const ease=1-Math.exp(-elapsed/95);cursorCurrentX+=(cursorTargetX-cursorCurrentX)*ease;cursorCurrentY+=(cursorTargetY-cursorCurrentY)*ease}cursorHalo.style.setProperty('--cursor-x',cursorCurrentX+'px');cursorHalo.style.setProperty('--cursor-y',cursorCurrentY+'px');if(Math.abs(cursorTargetX-cursorCurrentX)>.15||Math.abs(cursorTargetY-cursorCurrentY)>.15)cursorFrame=requestAnimationFrame(moveCursorHalo);else cursorFrameTime=0};window.addEventListener('pointermove',event=>{if(event.pointerType!=='mouse'||!hoverPointer.matches||$('#welcomeScreen').classList.contains('hidden'))return;cursorTargetX=event.clientX;cursorTargetY=event.clientY;if(cursorCurrentX===null||cursorCurrentY===null){cursorCurrentX=cursorTargetX;cursorCurrentY=cursorTargetY}cursorHalo.classList.add('visible');if(!cursorFrame)cursorFrame=requestAnimationFrame(moveCursorHalo)},{passive:true});const hideCursorHalo=()=>{cursorHalo.classList.remove('visible');cursorCurrentX=null;cursorFrameTime=0};window.addEventListener('pointerleave',hideCursorHalo);window.addEventListener('blur',hideCursorHalo);hoverPointer.addEventListener?.('change',event=>{if(!event.matches)hideCursorHalo()});
     const loadingScreen=$('#loadingScreen'),loadingContent=$('#loadingContent'),loadingStatus=$('#loadingStatus'),loadingError=$('#loadingError'),loadingErrorText=$('#loadingErrorText'),loadingMessages=['Setting up your booth...','Warming up the camera...','Almost ready...'],BOOTH_LOADING_MIN_MS=1200,BOOTH_LOADING_MAX_MS=8000;let loadingMessageTimer:ReturnType<typeof setInterval>|null=null;

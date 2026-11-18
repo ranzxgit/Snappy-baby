@@ -104,12 +104,42 @@
     <section class="faq-card">
       <header class="preview-header">
         <div><p class="faq-kicker">A LITTLE HELP</p><h2 id="faqTitle">Frequently asked questions</h2></div>
-        <button class="icon-btn" id="closeFaq" type="button" aria-label="Close frequently asked questions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+        <button class="icon-btn" id="closeFaq" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
       </header>
-      <details class="faq-item" open>
-        <summary>How does the online photobooth work?</summary>
-        <p>It all happens in your browser. Allow camera access, choose your session settings and photo style, then take your pictures. Your photo strip is put together for you to download or share.</p>
-      </details>
+      <div class="faq-list" id="faqList">
+        <section class="faq-item is-open">
+          <h3><button class="faq-question" id="faqQuestionPrivacy" type="button" aria-expanded="true" aria-controls="faqAnswerPrivacy">Are my photos stored or saved anywhere?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-answer" id="faqAnswerPrivacy" role="region" aria-labelledby="faqQuestionPrivacy" aria-hidden="false"><div class="faq-answer-inner"><p>No. Snappy Baby doesn't upload photos to a server. They're processed and temporarily held in browser memory while you create your strip. If you choose to download or share, your browser or device saves or passes the image to the destination you choose.</p></div></div>
+        </section>
+        <section class="faq-item">
+          <h3><button class="faq-question" id="faqQuestionHow" type="button" aria-expanded="false" aria-controls="faqAnswerHow">How does the online photobooth work?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-answer" id="faqAnswerHow" role="region" aria-labelledby="faqQuestionHow" aria-hidden="true"><div class="faq-answer-inner"><p>Allow camera access, choose your session settings and photo style, then take your pictures. Your strip is assembled in your browser and is ready to download or share.</p></div></div>
+        </section>
+        <section class="faq-item">
+          <h3><button class="faq-question" id="faqQuestionCamera" type="button" aria-expanded="false" aria-controls="faqAnswerCamera">What if my camera isn't working?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-answer" id="faqAnswerCamera" role="region" aria-labelledby="faqQuestionCamera" aria-hidden="true"><div class="faq-answer-inner"><p>Make sure you've granted camera permission in your browser and that another app isn't using the camera. If it still doesn't work, refresh the page or try a different, up-to-date browser. The photobooth needs camera access to take photos.</p></div></div>
+        </section>
+        <section class="faq-item">
+          <h3><button class="faq-question" id="faqQuestionAccount" type="button" aria-expanded="false" aria-controls="faqAnswerAccount">Do I need to create an account or sign up?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-answer" id="faqAnswerAccount" role="region" aria-labelledby="faqQuestionAccount" aria-hidden="true"><div class="faq-answer-inner"><p>No. Snappy Baby is free to use and doesn't require an account or sign-up. Just allow camera access when you want to take photos.</p></div></div>
+        </section>
+        <section class="faq-item">
+          <h3><button class="faq-question" id="faqQuestionDownload" type="button" aria-expanded="false" aria-controls="faqAnswerDownload">Can I download or share my photo strip?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-answer" id="faqAnswerDownload" role="region" aria-labelledby="faqQuestionDownload" aria-hidden="true"><div class="faq-answer-inner"><p>Yes. When your strip is ready, choose Save Photo to download it or Share Photo to use your browser's sharing options. Sharing availability depends on your browser and device.</p></div></div>
+        </section>
+        <section class="faq-item">
+          <h3><button class="faq-question" id="faqQuestionRetake" type="button" aria-expanded="false" aria-controls="faqAnswerRetake">Can I retake my photos or make another strip?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-answer" id="faqAnswerRetake" role="region" aria-labelledby="faqQuestionRetake" aria-hidden="true"><div class="faq-answer-inner"><p>Yes. Choose Retake photos to capture a new set, or Create a new strip to start fresh.</p></div></div>
+        </section>
+        <section class="faq-item">
+          <h3><button class="faq-question" id="faqQuestionCustomize" type="button" aria-expanded="false" aria-controls="faqAnswerCustomize">Can I customize my photo strip?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-answer" id="faqAnswerCustomize" role="region" aria-labelledby="faqQuestionCustomize" aria-hidden="true"><div class="faq-answer-inner"><p>Yes. Before your session, choose a frame and filter, set the countdown and number of photos, and add a caption or date to your strip.</p></div></div>
+        </section>
+        <section class="faq-item">
+          <h3><button class="faq-question" id="faqQuestionMobile" type="button" aria-expanded="false" aria-controls="faqAnswerMobile">Can I use the photobooth on my phone?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+          <div class="faq-answer" id="faqAnswerMobile" role="region" aria-labelledby="faqQuestionMobile" aria-hidden="true"><div class="faq-answer-inner"><p>Yes, on supported mobile browsers. Open Snappy Baby in a browser that supports camera access, allow permission, and use the switch-camera control to change cameras when available.</p></div></div>
+        </section>
+      </div>
     </section>
   </div>
 <script type="module" src="/src/main.ts"></script>
